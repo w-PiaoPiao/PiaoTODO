@@ -31,6 +31,7 @@ interface TodoState {
   deleteTodo: (todoId: string) => void;
   updateTodoContent: (todoId: string, content: string) => void;
   addProgressNote: (todoId: string, content: string) => void;
+  clearCompleted: () => void;
   reorderTodos: (todoIds: string[]) => void;
   setSelectedCategory: (categoryId: string | null) => void;
 
@@ -133,6 +134,12 @@ export const useTodoStore = create<TodoState>((set, get) => ({
             }
           : t
       ),
+    }));
+  },
+
+  clearCompleted: () => {
+    set((state) => ({
+      todos: state.todos.filter((t) => !t.completed),
     }));
   },
 

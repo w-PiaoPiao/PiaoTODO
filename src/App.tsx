@@ -4,6 +4,7 @@ import { useTodoStore } from "./stores/todoStore";
 import InputBox from "./components/InputBox";
 import CategoryBar from "./components/CategoryBar";
 import TodoList from "./components/TodoList";
+import CompletedSection from "./components/CompletedSection";
 
 function App() {
   const [inputValue, setInputValue] = useState("");
@@ -15,6 +16,8 @@ function App() {
     addTodo,
     getCategories,
     getIncompleteTodos,
+    getCompletedTodos,
+    clearCompleted,
   } = useTodoStore();
 
   const triggerShake = useCallback(() => {
@@ -78,6 +81,11 @@ function App() {
       <TodoList
         todos={displayTodos}
         categories={categories}
+      />
+      <CompletedSection
+        todos={getCompletedTodos()}
+        categories={categories}
+        onClear={clearCompleted}
       />
     </div>
   );
