@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Settings, CheckSquare } from "lucide-react";
-import { useTodoStore } from "./stores/todoStore";
+import { useTodoStore, initAutoSave } from "./stores/todoStore";
 import InputBox from "./components/InputBox";
 import CategoryBar from "./components/CategoryBar";
 import TodoList from "./components/TodoList";
@@ -18,7 +18,13 @@ function App() {
     getIncompleteTodos,
     getCompletedTodos,
     clearCompleted,
+    hydrate,
   } = useTodoStore();
+
+  useEffect(() => {
+    hydrate();
+    initAutoSave();
+  }, [hydrate]);
 
   const triggerShake = useCallback(() => {
     setShakeInput(true);

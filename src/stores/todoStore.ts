@@ -1,13 +1,7 @@
 import { create } from "zustand";
-import type { Todo, Category, Settings } from "../types";
+import type { Todo, Category, Settings, AppData } from "../types";
 import { generateId } from "../lib/idGenerator";
-
-const DEFAULT_CATEGORIES: Category[] = [
-  { id: "work", name: "工作", color: "#3B82F6", order: 0, createdAt: Date.now() },
-  { id: "life", name: "生活", color: "#10B981", order: 1, createdAt: Date.now() },
-  { id: "entertainment", name: "娱乐", color: "#F59E0B", order: 2, createdAt: Date.now() },
-  { id: "other", name: "其他", color: "#6B7280", order: 3, createdAt: Date.now() },
-];
+import { loadData, saveData, createDefaultAppData } from "../lib/storage";
 
 const DEFAULT_SETTINGS: Settings = {
   showCompleted: false,
@@ -15,6 +9,7 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 interface TodoState {
+  _isHydrated: boolean;
   categories: Category[];
   todos: Todo[];
   selectedCategoryId: string | null;
@@ -39,11 +34,13 @@ interface TodoState {
   updateCategory: (categoryId: string, updates: Partial<Pick<Category, "name" | "color" | "order">>) => void;
   deleteCategory: (categoryId: string) => void;
 
+  hydrate: () => Promise<void>;
   reset: () => void;
 }
 
 export const useTodoStore = create<TodoState>((set, get) => ({
-  categories: DEFAULT_CATEGORIES,
+  _isHydrated: false,
+  categories: [],
   todos: [],
   selectedCategoryId: null,
   settings: DEFAULT_SETTINGS,
@@ -202,12 +199,52 @@ export const useTodoStore = create<TodoState>((set, get) => ({
     }));
   },
 
+  hydrate: async () => {
+    const data = await loadData();
+    if (data) {
+      set({
+        categories: data.categories,
+        todos: data.todos,
+        settings: data.settings,
+        _isHydrated: true,
+      });
+    } else {
+      const defaults = createDefaultAppData();
+      set({
+        categories: defaults.categories,
+        todos: defaults.todos,
+        settings: defaults.settings,
+        _isHydrated: true,
+      });
+    }
+  },
+
   reset: () => {
+    const defaults = createDefaultAppData();
     set({
-      categories: DEFAULT_CATEGORIES,
-      todos: [],
+      categories: defaults.categories,
+      todos: defaults.todos,
       selectedCategoryId: null,
-      settings: DEFAULT_SETTINGS,
+      settings: defaults.settings,
     });
   },
 }));
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+export function initAutoSave() {
+  useTodoStore.subscribe((state) => {
+    if (!state._isHydrated) return;
+
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      const data: AppData = {
+        version: 1,
+        categories: state.categories,
+        todos: state.todos,
+        settings: state.settings,
+      };
+      saveData(data);
+    }, 300);
+  });
+}
