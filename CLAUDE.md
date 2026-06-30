@@ -67,7 +67,8 @@
 
 - **Phase 0 已完成**：Tauri + React + TypeScript 项目骨架就绪。
 - **Phase 1 已完成**：基础 UI 布局（标题栏、输入框、分类按钮、列表区）。
-- 下一步将进入 **Phase 2：状态管理与数据类型**。
+- **Phase 2 已完成**：状态管理与数据类型定义。
+- 下一步将进入 **Phase 3：通过分类按钮添加 todo**。
 - 当前阶段目标参考 `docs/execution-plan.md` 中对应 Phase 的验收标准。
 
 ## 快速链接
