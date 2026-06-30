@@ -27,6 +27,7 @@ interface TodoState {
 
   addTodo: (content: string, categoryId: string) => void;
   completeTodo: (todoId: string) => void;
+  toggleTodo: (todoId: string) => void;
   deleteTodo: (todoId: string) => void;
   updateTodoContent: (todoId: string, content: string) => void;
   addProgressNote: (todoId: string, content: string) => void;
@@ -84,6 +85,21 @@ export const useTodoStore = create<TodoState>((set, get) => ({
       todos: state.todos.map((t) =>
         t.id === todoId
           ? { ...t, completed: true, completedAt: Date.now(), updatedAt: Date.now() }
+          : t
+      ),
+    }));
+  },
+
+  toggleTodo: (todoId) => {
+    set((state) => ({
+      todos: state.todos.map((t) =>
+        t.id === todoId
+          ? {
+              ...t,
+              completed: !t.completed,
+              completedAt: t.completed ? null : Date.now(),
+              updatedAt: Date.now(),
+            }
           : t
       ),
     }));

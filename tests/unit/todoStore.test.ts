@@ -58,6 +58,19 @@ describe("todoStore", () => {
     });
   });
 
+  describe("toggleTodo", () => {
+    it("should toggle completed state", () => {
+      useTodoStore.getState().addTodo("测试", "work");
+      const todo = useTodoStore.getState().todos[0];
+
+      useTodoStore.getState().toggleTodo(todo.id);
+      expect(useTodoStore.getState().todos[0].completed).toBe(true);
+
+      useTodoStore.getState().toggleTodo(todo.id);
+      expect(useTodoStore.getState().todos[0].completed).toBe(false);
+    });
+  });
+
   describe("deleteTodo", () => {
     it("should remove the todo", () => {
       useTodoStore.getState().addTodo("测试", "work");
