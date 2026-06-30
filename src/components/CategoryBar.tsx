@@ -1,26 +1,18 @@
-const DEFAULT_CATEGORIES = [
-  { id: "work", name: "工作", color: "#3B82F6" },
-  { id: "life", name: "生活", color: "#10B981" },
-  { id: "entertainment", name: "娱乐", color: "#F59E0B" },
-  { id: "other", name: "其他", color: "#6B7280" },
-];
-
-interface Category {
-  id: string;
-  name: string;
-  color: string;
-}
+import { useTodoStore } from "../stores/todoStore";
 
 interface CategoryBarProps {
   onSelect: (categoryId: string) => void;
+  shaking: boolean;
 }
 
 function CategoryButton({
-  category,
+  name,
+  color,
   onClick,
 }: {
-  category: Category;
-  onClick: () => void;
+  name: string;
+  color: string;
+  onClick?: () => void;
 }) {
   return (
     <button
@@ -28,21 +20,25 @@ function CategoryButton({
       className="flex-1 h-9 mx-1 first:ml-0 last:mr-0 rounded-lg text-xs font-medium
                  text-white transition-all duration-150 active:scale-95
                  hover:brightness-110"
-      style={{ backgroundColor: category.color }}
+      style={{ backgroundColor: color }}
     >
-      {category.name}
+      {name}
     </button>
   );
 }
 
-function CategoryBar({ onSelect }: CategoryBarProps) {
+function CategoryBar({ onSelect, shaking }: CategoryBarProps) {
+  const { categories } = useTodoStore();
+  const sorted = [...categories].sort((a, b) => a.order - b.order);
+
   return (
-    <div className="px-4 pb-2">
+    <div className={`px-4 pb-2 transition-transform duration-200 ${shaking ? "animate-[shake_0.4s_ease]" : ""}`}>
       <div className="flex">
-        {DEFAULT_CATEGORIES.map((cat) => (
+        {sorted.map((cat) => (
           <CategoryButton
             key={cat.id}
-            category={cat}
+            name={cat.name}
+            color={cat.color}
             onClick={() => onSelect(cat.id)}
           />
         ))}

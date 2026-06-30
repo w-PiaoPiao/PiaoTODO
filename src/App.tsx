@@ -1,19 +1,57 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Settings, CheckSquare } from "lucide-react";
+import { useTodoStore } from "./stores/todoStore";
 import InputBox from "./components/InputBox";
 import CategoryBar from "./components/CategoryBar";
 import TodoList from "./components/TodoList";
 
 function App() {
-  const [todoCount] = useState(0);
+  const [inputValue, setInputValue] = useState("");
+  const [shakeInput, setShakeInput] = useState(false);
+  const [shakeCategory, setShakeCategory] = useState(false);
 
-  const handleAdd = (content: string) => {
-    console.log("add:", content);
-  };
+  const {
+    selectedCategoryId,
+    addTodo,
+    getCategories,
+    getIncompleteTodos,
+  } = useTodoStore();
 
-  const handleSelectCategory = (categoryId: string) => {
-    console.log("select category:", categoryId);
-  };
+  const triggerShake = useCallback(() => {
+    setShakeInput(true);
+    setShakeCategory(true);
+    setTimeout(() => {
+      setShakeInput(false);
+      setShakeCategory(false);
+    }, 500);
+  }, []);
+
+  const handleAdd = useCallback(
+    (content: string) => {
+      if (!selectedCategoryId) {
+        triggerShake();
+        return;
+      }
+      addTodo(content, selectedCategoryId);
+      setInputValue("");
+    },
+    [selectedCategoryId, addTodo, triggerShake]
+  );
+
+  const handleCategorySelect = useCallback(
+    (categoryId: string) => {
+      if (!inputValue.trim()) {
+        triggerShake();
+        return;
+      }
+      addTodo(inputValue.trim(), categoryId);
+      setInputValue("");
+    },
+    [inputValue, addTodo, triggerShake]
+  );
+
+  const categories = getCategories();
+  const displayTodos = getIncompleteTodos();
 
   return (
     <div className="flex flex-col h-screen bg-white">
@@ -27,17 +65,20 @@ function App() {
         </button>
       </header>
 
-      <InputBox onAdd={handleAdd} />
-      <CategoryBar onSelect={handleSelectCategory} />
-      <TodoList />
-
-      {todoCount > 0 && (
-        <footer className="border-t border-[#F0F0F0] px-4 py-2">
-          <button className="text-xs text-[#8E8E93] hover:text-[#1C1C1E] transition-colors">
-            ▼ 已完成（{todoCount}）
-          </button>
-        </footer>
-      )}
+      <InputBox
+        value={inputValue}
+        onChange={setInputValue}
+        onEnter={handleAdd}
+        shaking={shakeInput}
+      />
+      <CategoryBar
+        onSelect={handleCategorySelect}
+        shaking={shakeCategory}
+      />
+      <TodoList
+        todos={displayTodos}
+        categories={categories}
+      />
     </div>
   );
 }

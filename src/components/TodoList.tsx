@@ -1,3 +1,10 @@
+import type { Todo, Category } from "../types";
+
+interface TodoListProps {
+  todos: Todo[];
+  categories: Category[];
+}
+
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-[#C7C7CC]">
@@ -20,10 +27,49 @@ function EmptyState() {
   );
 }
 
-function TodoList() {
+function TodoItem({
+  todo,
+  category,
+}: {
+  todo: Todo;
+  category?: Category;
+}) {
+  return (
+    <div className="flex items-start gap-3 px-4 py-3 group hover:bg-[#F5F5F7] transition-colors">
+      <button className="mt-0.5 w-5 h-5 rounded-full border-2 border-[#C7C7CC] flex-shrink-0
+                         hover:border-[#3B82F6] transition-colors" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-[#1C1C1E] truncate">{todo.content}</p>
+        {todo.progressNotes.length > 0 && (
+          <p className="text-xs text-[#8E8E93] mt-0.5 truncate">
+            └ {todo.progressNotes[todo.progressNotes.length - 1].content}
+          </p>
+        )}
+      </div>
+      {category && (
+        <span
+          className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+          style={{ backgroundColor: category.color }}
+        />
+      )}
+    </div>
+  );
+}
+
+function TodoList({ todos, categories }: TodoListProps) {
+  if (todos.length === 0) return <EmptyState />;
+
+  const categoryMap = new Map(categories.map((c) => [c.id, c]));
+
   return (
     <div className="flex-1 overflow-y-auto">
-      <EmptyState />
+      {todos.map((todo) => (
+        <TodoItem
+          key={todo.id}
+          todo={todo}
+          category={categoryMap.get(todo.categoryId)}
+        />
+      ))}
     </div>
   );
 }
