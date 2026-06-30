@@ -5,11 +5,13 @@ import InputBox from "./components/InputBox";
 import CategoryBar from "./components/CategoryBar";
 import TodoList from "./components/TodoList";
 import CompletedSection from "./components/CompletedSection";
+import SettingsPanel from "./components/SettingsPanel";
 
 function App() {
   const [inputValue, setInputValue] = useState("");
   const [shakeInput, setShakeInput] = useState(false);
   const [shakeCategory, setShakeCategory] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const {
     selectedCategoryId,
@@ -62,6 +64,10 @@ function App() {
   const categories = getCategories();
   const displayTodos = getIncompleteTodos();
 
+  if (showSettings) {
+    return <SettingsPanel onClose={() => setShowSettings(false)} />;
+  }
+
   return (
     <div className="flex flex-col h-screen bg-white">
       <header className="flex items-center justify-between px-4 py-3 border-b border-[#F0F0F0]">
@@ -69,7 +75,7 @@ function App() {
           <CheckSquare className="w-4 h-4 text-[#3B82F6]" />
           <h1 className="text-sm font-semibold text-[#1C1C1E]">LiteToDo</h1>
         </div>
-        <button className="p-1 rounded-md hover:bg-[#F5F5F7] transition-colors">
+        <button onClick={() => setShowSettings(true)} className="p-1 rounded-md hover:bg-[#F5F5F7] transition-colors">
           <Settings className="w-4 h-4 text-[#8E8E93]" />
         </button>
       </header>

@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useTodoStore } from "../stores/todoStore";
 import { useLongPress } from "../hooks/useLongPress";
+import CategoryMenu from "./CategoryMenu";
 
 interface CategoryBarProps {
   onSelect: (categoryId: string) => void;
@@ -59,6 +61,12 @@ function FilterBanner({
 
 function CategoryBar({ onSelect, shaking }: CategoryBarProps) {
   const { categories, selectedCategoryId, setSelectedCategory } = useTodoStore();
+  const [menuCategory, setMenuCategory] = useState<{
+    id: string;
+    name: string;
+    color: string;
+  } | null>(null);
+
   const sorted = [...categories].sort((a, b) => a.order - b.order);
 
   const selectedCategory = selectedCategoryId
@@ -66,7 +74,7 @@ function CategoryBar({ onSelect, shaking }: CategoryBarProps) {
     : null;
 
   return (
-    <div>
+    <div className="relative">
       <div
         className={`px-4 pb-2 transition-transform duration-200 ${shaking ? "animate-[shake_0.4s_ease]" : ""}`}
       >
@@ -78,11 +86,23 @@ function CategoryBar({ onSelect, shaking }: CategoryBarProps) {
               color={cat.color}
               active={cat.id === selectedCategoryId}
               onClick={() => onSelect(cat.id)}
-              onLongPress={() => setSelectedCategory(cat.id)}
+              onLongPress={() =>
+                setMenuCategory({ id: cat.id, name: cat.name, color: cat.color })
+              }
             />
           ))}
         </div>
       </div>
+
+      {menuCategory && (
+        <CategoryMenu
+          categoryId={menuCategory.id}
+          categoryName={menuCategory.name}
+          categoryColor={menuCategory.color}
+          onClose={() => setMenuCategory(null)}
+        />
+      )}
+
       {selectedCategory && (
         <FilterBanner
           categoryName={selectedCategory.name}
