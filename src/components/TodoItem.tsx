@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { useTodoStore } from "../stores/todoStore";
+import { useLongPress } from "../hooks/useLongPress";
+import ProgressDialog from "./ProgressDialog";
 import type { Todo, Category } from "../types";
 
 interface TodoItemProps {
@@ -11,8 +13,10 @@ interface TodoItemProps {
 function TodoItem({ todo, category }: TodoItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showProgressDialog, setShowProgressDialog] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { toggleTodo, deleteTodo, updateTodoContent } = useTodoStore();
+  const { toggleTodo, deleteTodo, updateTodoContent, addProgressNote } = useTodoStore();
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -21,15 +25,18 @@ function TodoItem({ todo, category }: TodoItemProps) {
     }
   }, [editing]);
 
-  const handleComplete = () => {
+  const handleComplete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     toggleTodo(todo.id);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     deleteTodo(todo.id);
   };
 
-  const startEdit = () => {
+  const startEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setEditValue(todo.content);
     setEditing(true);
   };
@@ -47,72 +54,130 @@ function TodoItem({ todo, category }: TodoItemProps) {
     setEditing(false);
   };
 
+  const toggleExpand = () => {
+    if (!editing) {
+      setShowHistory((prev) => !prev);
+    }
+  };
+
+  const longPress = useLongPress({
+    onLongPress: () => setShowProgressDialog(true),
+    onClick: toggleExpand,
+  });
+
+  const formatTime = (ts: number) => {
+    const d = new Date(ts);
+    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+  };
+
   return (
-    <div className="group flex items-start gap-3 px-4 py-2.5 hover:bg-[#F5F5F7] transition-colors">
-      <button
-        onClick={handleComplete}
-        className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center
-                    transition-all duration-200
-                    ${
-                      todo.completed
-                        ? "bg-[#3B82F6] border-[#3B82F6]"
-                        : "border-[#C7C7CC] hover:border-[#3B82F6]"
-                    }`}
+    <>
+      <div
+        {...longPress}
+        className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] transition-colors cursor-default"
       >
-        {todo.completed && (
-          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-          </svg>
-        )}
-      </button>
-
-      <div className="flex-1 min-w-0">
-        {editing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onBlur={saveEdit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") saveEdit();
-              if (e.key === "Escape") cancelEdit();
-            }}
-            className="w-full text-sm bg-transparent border-b border-[#3B82F6] outline-none text-[#1C1C1E] py-0.5"
-          />
-        ) : (
-          <p
-            onClick={startEdit}
-            className={`text-sm transition-colors cursor-text
-                        ${todo.completed ? "text-[#C7C7CC] line-through" : "text-[#1C1C1E]"}`}
+        <div className="flex items-start gap-3">
+          <button
+            onClick={handleComplete}
+            className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center
+                        transition-all duration-200
+                        ${
+                          todo.completed
+                            ? "bg-[#3B82F6] border-[#3B82F6]"
+                            : "border-[#C7C7CC] hover:border-[#3B82F6]"
+                        }`}
           >
-            {todo.content}
-          </p>
-        )}
+            {todo.completed && (
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
 
-        {!editing && todo.progressNotes.length > 0 && (
-          <p className="text-xs text-[#8E8E93] mt-0.5 truncate">
-            └ {todo.progressNotes[todo.progressNotes.length - 1].content}
-          </p>
+          <div className="flex-1 min-w-0">
+            {editing ? (
+              <input
+                ref={inputRef}
+                type="text"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={saveEdit}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === "Enter") saveEdit();
+                  if (e.key === "Escape") cancelEdit();
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full text-sm bg-transparent border-b border-[#3B82F6] outline-none text-[#1C1C1E] py-0.5"
+              />
+            ) : (
+              <p
+                onClick={startEdit}
+                className={`text-sm transition-colors cursor-text
+                            ${todo.completed ? "text-[#C7C7CC] line-through" : "text-[#1C1C1E]"}`}
+              >
+                {todo.content}
+              </p>
+            )}
+
+            {!editing && todo.progressNotes.length > 0 && (
+              <p className="text-xs text-[#8E8E93] mt-0.5 truncate">
+                └ {todo.progressNotes[todo.progressNotes.length - 1].content}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <button
+              onClick={handleDelete}
+              className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-[#C7C7CC]
+                         hover:text-[#EF4444] hover:bg-[#FEE2E2] transition-all duration-200"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+            {category && (
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: category.color }}
+              />
+            )}
+            {todo.progressNotes.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowHistory((prev) => !prev);
+                }}
+                className="p-1 rounded-md text-[#C7C7CC] hover:text-[#3B82F6] hover:bg-[#EFF6FF] transition-all"
+              >
+                {showHistory ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {showHistory && todo.progressNotes.length > 0 && (
+          <div className="ml-8 mt-2 space-y-1.5 border-l-2 border-[#E5E7EB] pl-3">
+            {[...todo.progressNotes].reverse().map((note) => (
+              <div key={note.id} className="flex items-start gap-2">
+                <Clock className="w-3 h-3 text-[#C7C7CC] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-[#6B7280]">{note.content}</p>
+                  <p className="text-[10px] text-[#C7C7CC]">{formatTime(note.createdAt)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      <div className="flex items-center gap-1.5 flex-shrink-0">
-        <button
-          onClick={handleDelete}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-[#C7C7CC]
-                     hover:text-[#EF4444] hover:bg-[#FEE2E2] transition-all duration-200"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
-        {category && (
-          <span
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: category.color }}
-          />
-        )}
-      </div>
-    </div>
+      {showProgressDialog && (
+        <ProgressDialog
+          todoContent={todo.content}
+          onSubmit={(content) => addProgressNote(todo.id, content)}
+          onClose={() => setShowProgressDialog(false)}
+        />
+      )}
+    </>
   );
 }
 
