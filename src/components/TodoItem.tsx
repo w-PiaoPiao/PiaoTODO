@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { X, ChevronDown, ChevronUp, Clock } from "lucide-react";
+import { X, ChevronDown, ChevronUp, Clock, GripVertical } from "lucide-react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useTodoStore } from "../stores/todoStore";
 import { useLongPress } from "../hooks/useLongPress";
 import ProgressDialog from "./ProgressDialog";
@@ -17,6 +19,23 @@ function TodoItem({ todo, category }: TodoItemProps) {
   const [showProgressDialog, setShowProgressDialog] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toggleTodo, deleteTodo, updateTodoContent, addProgressNote } = useTodoStore();
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: todo.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+    position: "relative" as const,
+    zIndex: isDragging ? 10 : undefined,
+  };
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -73,10 +92,21 @@ function TodoItem({ todo, category }: TodoItemProps) {
   return (
     <>
       <div
+        ref={setNodeRef}
+        style={style}
         {...longPress}
         className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] transition-colors cursor-default"
       >
         <div className="flex items-start gap-3">
+          <button
+            className="mt-1 opacity-0 group-hover:opacity-100 p-0.5 rounded cursor-grab active:cursor-grabbing
+                       text-[#C7C7CC] hover:text-[#8E8E93] transition-all duration-200 flex-shrink-0"
+            {...attributes}
+            {...listeners}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GripVertical className="w-3.5 h-3.5" />
+          </button>
           <button
             onClick={handleComplete}
             className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center

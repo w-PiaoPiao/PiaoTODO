@@ -1,6 +1,18 @@
-import type { Category } from "../types";
-import type { Todo } from "../types";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useTodoStore } from "../stores/todoStore";
 import TodoItem from "./TodoItem";
+import type { Category, Todo } from "../types";
 
 interface TodoListProps {
   todos: Todo[];
@@ -30,20 +42,51 @@ function EmptyState() {
 }
 
 function TodoList({ todos, categories }: TodoListProps) {
+  const reorderTodos = useTodoStore((s) => s.reorderTodos);
   const categoryMap = new Map(categories.map((c) => [c.id, c]));
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  );
 
   if (todos.length === 0) return <EmptyState />;
 
+  const todoIds = todos.map((t) => t.id);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = todoIds.indexOf(active.id as string);
+    const newIndex = todoIds.indexOf(over.id as string);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = [...todoIds];
+    reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, active.id as string);
+    reorderTodos(reordered);
+  };
+
   return (
-    <div className="flex-1 overflow-y-auto">
-      {todos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          category={categoryMap.get(todo.categoryId)}
-        />
-      ))}
-    </div>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={todoIds} strategy={verticalListSortingStrategy}>
+        <div className="flex-1 overflow-y-auto">
+          {todos.map((todo) => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              category={categoryMap.get(todo.categoryId)}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }
 
