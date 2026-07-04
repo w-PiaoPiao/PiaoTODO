@@ -14,7 +14,6 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
 
   const {
-    selectedCategoryId,
     addTodo,
     getCategories,
     getIncompleteTodos,
@@ -36,18 +35,6 @@ function App() {
       setShakeCategory(false);
     }, 500);
   }, []);
-
-  const handleAdd = useCallback(
-    (content: string) => {
-      if (!selectedCategoryId) {
-        triggerShake();
-        return;
-      }
-      addTodo(content, selectedCategoryId);
-      setInputValue("");
-    },
-    [selectedCategoryId, addTodo, triggerShake]
-  );
 
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
@@ -83,7 +70,6 @@ function App() {
       <InputBox
         value={inputValue}
         onChange={setInputValue}
-        onEnter={handleAdd}
         shaking={shakeInput}
       />
       <CategoryBar
