@@ -208,7 +208,7 @@ export const useTodoStore = create<TodoState>((set, get) => ({
       set({
         categories: data.categories,
         todos: data.todos,
-        settings: data.settings,
+        settings: { ...DEFAULT_SETTINGS, ...data.settings },
         _isHydrated: true,
       });
     } else {
