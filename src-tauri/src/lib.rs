@@ -3,8 +3,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::Instant;
 use tauri::Manager;
-use tauri::tray::TrayIconBuilder;
-use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri_plugin_global_shortcut::GlobalShortcutExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 
@@ -78,18 +77,18 @@ pub fn run() {
                 .build(),
         )
         .setup(|app| {
-            let show_item = MenuItem::with_id(app, "toggle", "显示/隐藏 LiteToDo", true, None::<&str>)?;
-            let quit_item = MenuItem::with_id(app, "quit", "退出", true, Some("Cmd+Q"))?;
-            let menu = Menu::with_items(app, &[&show_item, &quit_item])?;
-
             TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .tooltip("LiteToDo")
-                .menu(&menu)
-                .on_menu_event(|app, event| {
-                    match event.id().as_ref() {
-                        "toggle" => toggle_window(app),
-                        "quit" => app.exit(0),
+                .on_tray_icon_event(|tray, event| {
+                    match event {
+                        TrayIconEvent::Click {
+                            button: MouseButton::Left,
+                            button_state: MouseButtonState::Up,
+                            ..
+                        } => {
+                            toggle_window(tray.app_handle());
+                        }
                         _ => {}
                     }
                 })
