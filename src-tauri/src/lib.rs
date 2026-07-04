@@ -12,6 +12,19 @@ struct AppState {
     last_shown: Mutex<Instant>,
 }
 
+fn load_icon_data(path: &str) -> (Vec<u8>, u32, u32) {
+    use std::io::BufReader;
+    let file = fs::File::open(path).expect("icon file not found");
+    let reader = BufReader::new(file);
+    let mut decoder = png::Decoder::new(reader);
+    decoder.set_transformations(png::Transformations::EXPAND | png::Transformations::ALPHA);
+    let mut reader = decoder.read_info().expect("failed to read png info");
+    let mut buf = vec![0; reader.output_buffer_size()];
+    let info = reader.next_frame(&mut buf).expect("failed to decode png");
+    let rgba = &buf[..info.buffer_size()];
+    (rgba.to_vec(), info.width, info.height)
+}
+
 fn get_data_path(app: &tauri::AppHandle) -> PathBuf {
     let app_dir = app
         .path()
@@ -78,9 +91,8 @@ pub fn run() {
                 .build(),
         )
         .setup(|app| {
-            let icon = app.default_window_icon()
-                .cloned()
-                .unwrap_or_else(|| Image::new(&[59, 130, 246, 255], 1, 1));
+            let (rgba, w, h) = load_icon_data("icons/32x32.png");
+            let icon = Image::new_owned(rgba, w, h);
 
             TrayIconBuilder::new()
                 .icon(icon)
