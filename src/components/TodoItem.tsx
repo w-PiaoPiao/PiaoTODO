@@ -95,18 +95,19 @@ function TodoItem({ todo, category }: TodoItemProps) {
         ref={setNodeRef}
         style={style}
         {...longPress}
-        className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] transition-colors cursor-default"
+        className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors cursor-default"
       >
         <div className="flex items-start gap-3">
           <button
             className="mt-1 opacity-0 group-hover:opacity-100 p-0.5 rounded cursor-grab active:cursor-grabbing
-                       text-[#C7C7CC] hover:text-[#8E8E93] transition-all duration-200 flex-shrink-0"
+                       text-[#C7C7CC] dark:text-[#636366] hover:text-[#8E8E93] dark:hover:text-[#98989D] transition-all duration-200 flex-shrink-0"
             {...attributes}
             {...listeners}
             onClick={(e) => e.stopPropagation()}
           >
             <GripVertical className="w-3.5 h-3.5" />
           </button>
+
           <button
             onClick={handleComplete}
             className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center
@@ -114,7 +115,7 @@ function TodoItem({ todo, category }: TodoItemProps) {
                         ${
                           todo.completed
                             ? "bg-[#3B82F6] border-[#3B82F6]"
-                            : "border-[#C7C7CC] hover:border-[#3B82F6]"
+                            : "border-[#C7C7CC] dark:border-[#636366] hover:border-[#3B82F6]"
                         }`}
           >
             {todo.completed && (
@@ -138,20 +139,20 @@ function TodoItem({ todo, category }: TodoItemProps) {
                   if (e.key === "Escape") cancelEdit();
                 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full text-sm bg-transparent border-b border-[#3B82F6] outline-none text-[#1C1C1E] py-0.5"
+                className="w-full text-sm bg-transparent border-b border-[#3B82F6] outline-none text-[#1C1C1E] dark:text-[#F5F5F5] py-0.5"
               />
             ) : (
               <p
                 onClick={startEdit}
                 className={`text-sm transition-colors cursor-text
-                            ${todo.completed ? "text-[#C7C7CC] line-through" : "text-[#1C1C1E]"}`}
+                            ${todo.completed ? "text-[#C7C7CC] dark:text-[#636366] line-through" : "text-[#1C1C1E] dark:text-[#F5F5F5]"}`}
               >
                 {todo.content}
               </p>
             )}
 
             {!editing && todo.progressNotes.length > 0 && (
-              <p className="text-xs text-[#8E8E93] mt-0.5 truncate">
+              <p className="text-xs text-[#8E8E93] dark:text-[#98989D] mt-0.5 truncate">
                 └ {todo.progressNotes[todo.progressNotes.length - 1].content}
               </p>
             )}
@@ -160,8 +161,8 @@ function TodoItem({ todo, category }: TodoItemProps) {
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
               onClick={handleDelete}
-              className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-[#C7C7CC]
-                         hover:text-[#EF4444] hover:bg-[#FEE2E2] transition-all duration-200"
+              className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-[#C7C7CC] dark:text-[#636366]
+                         hover:text-[#EF4444] hover:bg-[#FEE2E2] dark:hover:bg-[#3B1C1C] transition-all duration-200"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -177,7 +178,7 @@ function TodoItem({ todo, category }: TodoItemProps) {
                   e.stopPropagation();
                   setShowHistory((prev) => !prev);
                 }}
-                className="p-1 rounded-md text-[#C7C7CC] hover:text-[#3B82F6] hover:bg-[#EFF6FF] transition-all"
+                className="p-1 rounded-md text-[#C7C7CC] dark:text-[#636366] hover:text-[#3B82F6] hover:bg-[#EFF6FF] dark:hover:bg-[#1E3A5F] transition-all"
               >
                 {showHistory ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </button>
@@ -186,13 +187,13 @@ function TodoItem({ todo, category }: TodoItemProps) {
         </div>
 
         {showHistory && todo.progressNotes.length > 0 && (
-          <div className="ml-8 mt-2 space-y-1.5 border-l-2 border-[#E5E7EB] pl-3">
+          <div className="ml-8 mt-2 space-y-1.5 border-l-2 border-[#E5E7EB] dark:border-[#38383A] pl-3">
             {[...todo.progressNotes].reverse().map((note) => (
               <div key={note.id} className="flex items-start gap-2">
-                <Clock className="w-3 h-3 text-[#C7C7CC] mt-0.5 flex-shrink-0" />
+                <Clock className="w-3 h-3 text-[#C7C7CC] dark:text-[#636366] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs text-[#6B7280]">{note.content}</p>
-                  <p className="text-[10px] text-[#C7C7CC]">{formatTime(note.createdAt)}</p>
+                  <p className="text-xs text-[#6B7280] dark:text-[#98989D]">{note.content}</p>
+                  <p className="text-[10px] text-[#C7C7CC] dark:text-[#636366]">{formatTime(note.createdAt)}</p>
                 </div>
               </div>
             ))}

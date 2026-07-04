@@ -37,6 +37,7 @@ export function createDefaultAppData(): AppData {
     settings: {
       showCompleted: false,
       lastSelectedCategory: null,
+      darkMode: "system",
     },
   };
 }

@@ -27,6 +27,7 @@ export interface Todo {
 export interface Settings {
   showCompleted: boolean;
   lastSelectedCategory: string | null;
+  darkMode: "system" | "light" | "dark";
 }
 
 export interface AppData {

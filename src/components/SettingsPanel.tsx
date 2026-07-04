@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Sun, Moon, Monitor } from "lucide-react";
 import { useTodoStore } from "../stores/todoStore";
 
 interface SettingsPanelProps {
@@ -19,6 +19,8 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
     updateCategory,
     deleteCategory,
     getCategories,
+    settings,
+    updateSetting,
   } = useTodoStore();
 
   const [showAdd, setShowAdd] = useState(false);
@@ -43,21 +45,46 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
     deleteCategory(id);
   };
 
+  const toggleDark = (mode: "system" | "light" | "dark") => {
+    updateSetting("darkMode", mode);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-white">
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-[#F0F0F0]">
-        <button onClick={onClose} className="p-1 rounded-md hover:bg-[#F5F5F7] transition-colors">
+    <div className="flex flex-col h-screen bg-white dark:bg-[#1C1C1E]">
+      <header className="flex items-center gap-3 px-4 py-3 border-b border-[#F0F0F0] dark:border-[#38383A]">
+        <button onClick={onClose} className="p-1 rounded-md hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors">
           <ArrowLeft className="w-4 h-4 text-[#8E8E93]" />
         </button>
-        <h1 className="text-sm font-semibold text-[#1C1C1E]">设置</h1>
+        <h1 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F5F5F5]">设置</h1>
       </header>
 
       <div className="flex-1 overflow-y-auto p-4">
-        <h2 className="text-xs font-medium text-[#8E8E93] uppercase tracking-wider mb-3">分类管理</h2>
+        <h2 className="text-xs font-medium text-[#8E8E93] dark:text-[#98989D] uppercase tracking-wider mb-3">外观</h2>
+        <div className="flex gap-2 mb-6">
+          {[
+            { mode: "light" as const, icon: Sun, label: "浅色" },
+            { mode: "dark" as const, icon: Moon, label: "深色" },
+            { mode: "system" as const, icon: Monitor, label: "跟随系统" },
+          ].map(({ mode, icon: Icon, label }) => (
+            <button
+              key={mode}
+              onClick={() => toggleDark(mode)}
+              className={`flex-1 flex flex-col items-center gap-1.5 p-3 rounded-lg text-xs transition-all
+                         ${settings.darkMode === mode
+                           ? "bg-[#3B82F6] text-white"
+                           : "bg-[#F5F5F7] dark:bg-[#2C2C2E] text-[#8E8E93] dark:text-[#98989D] hover:bg-[#E5E7EB] dark:hover:bg-[#3A3A3C]"}`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <h2 className="text-xs font-medium text-[#8E8E93] dark:text-[#98989D] uppercase tracking-wider mb-3">分类管理</h2>
 
         <div className="space-y-2">
           {sorted.map((cat) => (
-            <div key={cat.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#F5F5F7] transition-colors">
+            <div key={cat.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors">
               <span
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: cat.color }}
@@ -79,11 +106,11 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
                     if (e.key === "Escape") setEditingId(null);
                   }}
                   autoFocus
-                  className="flex-1 text-sm bg-transparent border-b border-[#3B82F6] outline-none text-[#1C1C1E]"
+                  className="flex-1 text-sm bg-transparent border-b border-[#3B82F6] outline-none text-[#1C1C1E] dark:text-[#F5F5F5]"
                 />
               ) : (
                 <span
-                  className="flex-1 text-sm text-[#1C1C1E] cursor-pointer"
+                  className="flex-1 text-sm text-[#1C1C1E] dark:text-[#F5F5F5] cursor-pointer"
                   onClick={() => { setEditingId(cat.id); setEditName(cat.name); }}
                 >
                   {cat.name}
@@ -103,7 +130,7 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
               {categories.length > 1 && (
                 <button
                   onClick={() => handleDelete(cat.id)}
-                  className="p-1 rounded-md text-[#C7C7CC] hover:text-[#EF4444] hover:bg-[#FEE2E2] transition-all"
+                  className="p-1 rounded-md text-[#C7C7CC] dark:text-[#636366] hover:text-[#EF4444] hover:bg-[#FEE2E2] dark:hover:bg-[#3B1C1C] transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -113,8 +140,8 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
         </div>
 
         {showAdd ? (
-          <div className="mt-4 p-3 rounded-lg bg-[#F5F5F7]">
-            <p className="text-xs text-[#8E8E93] mb-2">添加分类</p>
+          <div className="mt-4 p-3 rounded-lg bg-[#F5F5F7] dark:bg-[#2C2C2E]">
+            <p className="text-xs text-[#8E8E93] dark:text-[#98989D] mb-2">添加分类</p>
             <input
               type="text"
               value={newName}
@@ -125,7 +152,7 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
               }}
               placeholder="分类名称"
               autoFocus
-              className="w-full h-8 px-2 text-sm bg-white rounded-lg border-none outline-none
+              className="w-full h-8 px-2 text-sm bg-white dark:bg-[#3A3A3C] dark:text-[#F5F5F5] rounded-lg border-none outline-none
                          focus:ring-2 focus:ring-[#3B82F6]/30 mb-2"
             />
             <div className="flex flex-wrap gap-1.5 mb-3">
@@ -133,7 +160,7 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <button
                   key={c}
                   onClick={() => setNewColor(c)}
-                  className={`w-6 h-6 rounded-full transition-all ${c === newColor ? "ring-2 ring-offset-1 ring-[#1C1C1E] scale-110" : "hover:scale-110"}`}
+                  className={`w-6 h-6 rounded-full transition-all ${c === newColor ? "ring-2 ring-offset-1 ring-[#1C1C1E] dark:ring-[#F5F5F5] scale-110" : "hover:scale-110"}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -141,7 +168,7 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowAdd(false)}
-                className="px-3 py-1.5 text-xs text-[#8E8E93] rounded-lg hover:bg-white transition-colors"
+                className="px-3 py-1.5 text-xs text-[#8E8E93] dark:text-[#98989D] rounded-lg hover:bg-white dark:hover:bg-[#3A3A3C] transition-colors"
               >
                 取消
               </button>
@@ -156,7 +183,7 @@ function SettingsPanel({ onClose }: SettingsPanelProps) {
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="flex items-center gap-2 mt-4 px-3 py-2 text-sm text-[#3B82F6] rounded-lg hover:bg-[#EFF6FF] transition-colors"
+            className="flex items-center gap-2 mt-4 px-3 py-2 text-sm text-[#3B82F6] rounded-lg hover:bg-[#EFF6FF] dark:hover:bg-[#1E3A5F] transition-colors"
           >
             <Plus className="w-4 h-4" />
             添加分类

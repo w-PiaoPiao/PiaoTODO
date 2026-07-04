@@ -20,12 +20,28 @@ function App() {
     getCompletedTodos,
     clearCompleted,
     hydrate,
+    settings,
   } = useTodoStore();
 
   useEffect(() => {
     hydrate();
     initAutoSave();
   }, [hydrate]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const applyTheme = () => {
+      const isDark =
+        settings.darkMode === "dark" ||
+        (settings.darkMode === "system" && mediaQuery.matches);
+      document.documentElement.classList.toggle("dark", isDark);
+    };
+
+    applyTheme();
+    mediaQuery.addEventListener("change", applyTheme);
+    return () => mediaQuery.removeEventListener("change", applyTheme);
+  }, [settings.darkMode]);
 
   const triggerShake = useCallback(() => {
     setShakeInput(true);
@@ -56,13 +72,13 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-[#F0F0F0]">
+    <div className="flex flex-col h-screen bg-white dark:bg-[#1C1C1E]">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-[#F0F0F0] dark:border-[#38383A]">
         <div className="flex items-center gap-2">
           <CheckSquare className="w-4 h-4 text-[#3B82F6]" />
-          <h1 className="text-sm font-semibold text-[#1C1C1E]">LiteToDo</h1>
+          <h1 className="text-sm font-semibold text-[#1C1C1E] dark:text-[#F5F5F5]">LiteToDo</h1>
         </div>
-        <button onClick={() => setShowSettings(true)} className="p-1 rounded-md hover:bg-[#F5F5F7] transition-colors">
+        <button onClick={() => setShowSettings(true)} className="p-1 rounded-md hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors">
           <Settings className="w-4 h-4 text-[#8E8E93]" />
         </button>
       </header>

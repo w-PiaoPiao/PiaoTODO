@@ -23,15 +23,15 @@ function ProgressDialog({ todoContent, onSubmit, onClose }: ProgressDialogProps)
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 dark:bg-black/50"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-xl p-4 w-72 mx-4"
+        className="bg-white dark:bg-[#2C2C2E] rounded-xl shadow-xl p-4 w-72 mx-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-sm font-medium text-[#1C1C1E] mb-1 truncate">{todoContent}</p>
-        <p className="text-xs text-[#8E8E93] mb-3">添加进度记录</p>
+        <p className="text-sm font-medium text-[#1C1C1E] dark:text-[#F5F5F5] mb-1 truncate">{todoContent}</p>
+        <p className="text-xs text-[#8E8E93] dark:text-[#98989D] mb-3">添加进度记录</p>
         <input
           ref={inputRef}
           type="text"
@@ -42,15 +42,15 @@ function ProgressDialog({ todoContent, onSubmit, onClose }: ProgressDialogProps)
             if (e.key === "Escape") onClose();
           }}
           placeholder="输入最新进展..."
-          className="w-full h-9 px-3 text-sm bg-[#F5F5F7] rounded-lg border-none outline-none
-                     placeholder:text-[#C7C7CC] text-[#1C1C1E]
-                     focus:ring-2 focus:ring-[#3B82F6]/30 focus:bg-white
+          className="w-full h-9 px-3 text-sm bg-[#F5F5F7] dark:bg-[#3A3A3C] dark:text-[#F5F5F5] rounded-lg border-none outline-none
+                     placeholder:text-[#C7C7CC] dark:placeholder:text-[#636366] text-[#1C1C1E] dark:text-[#F5F5F5]
+                     focus:ring-2 focus:ring-[#3B82F6]/30 focus:bg-white dark:focus:bg-[#3A3A3C]
                      transition-all duration-200"
         />
         <div className="flex justify-end gap-2 mt-3">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs text-[#8E8E93] rounded-lg hover:bg-[#F5F5F7] transition-colors"
+            className="px-3 py-1.5 text-xs text-[#8E8E93] dark:text-[#98989D] rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#3A3A3C] transition-colors"
           >
             取消
           </button>

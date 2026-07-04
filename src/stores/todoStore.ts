@@ -6,6 +6,7 @@ import { loadData, saveData, createDefaultAppData } from "../lib/storage";
 const DEFAULT_SETTINGS: Settings = {
   showCompleted: false,
   lastSelectedCategory: null,
+  darkMode: "system",
 };
 
 interface TodoState {
@@ -33,6 +34,8 @@ interface TodoState {
   addCategory: (name: string, color: string) => void;
   updateCategory: (categoryId: string, updates: Partial<Pick<Category, "name" | "color" | "order">>) => void;
   deleteCategory: (categoryId: string) => void;
+
+  updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
 
   hydrate: () => Promise<void>;
   reset: () => void;
@@ -217,6 +220,12 @@ export const useTodoStore = create<TodoState>((set, get) => ({
         _isHydrated: true,
       });
     }
+  },
+
+  updateSetting: (key, value) => {
+    set((state) => ({
+      settings: { ...state.settings, [key]: value },
+    }));
   },
 
   reset: () => {

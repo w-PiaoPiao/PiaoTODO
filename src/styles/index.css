@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    @apply bg-white text-[#1C1C1E];
+  }
+  html.dark {
+    @apply bg-[#1C1C1E] text-[#F5F5F5];
+  }
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-6px); }
