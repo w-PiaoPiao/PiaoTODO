@@ -13,8 +13,10 @@ export function useLongPress({
 }: UseLongPressOptions) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
+  const started = useRef(false);
 
   const start = useCallback(() => {
+    started.current = true;
     isLongPress.current = false;
     timerRef.current = setTimeout(() => {
       isLongPress.current = true;
@@ -27,15 +29,24 @@ export function useLongPress({
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-    if (!isLongPress.current && onClick) {
+    if (started.current && !isLongPress.current && onClick) {
       onClick();
     }
+    started.current = false;
   }, [onClick]);
+
+  const cancel = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    started.current = false;
+  }, []);
 
   return {
     onMouseDown: start,
     onMouseUp: stop,
-    onMouseLeave: stop,
+    onMouseLeave: cancel,
     onTouchStart: start,
     onTouchEnd: stop,
   };
