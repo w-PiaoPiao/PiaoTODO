@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::Instant;
 use tauri::Manager;
+use tauri::image::Image;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri_plugin_global_shortcut::GlobalShortcutExt;
 use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
@@ -77,8 +78,12 @@ pub fn run() {
                 .build(),
         )
         .setup(|app| {
+            let icon = app.default_window_icon()
+                .cloned()
+                .unwrap_or_else(|| Image::new(&[59, 130, 246, 255], 1, 1));
+
             TrayIconBuilder::new()
-                .icon(app.default_window_icon().unwrap().clone())
+                .icon(icon)
                 .tooltip("LiteToDo")
                 .on_tray_icon_event(|tray, event| {
                     match event {
