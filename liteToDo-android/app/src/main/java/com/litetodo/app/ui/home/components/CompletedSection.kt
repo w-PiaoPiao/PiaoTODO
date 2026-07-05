@@ -1,6 +1,7 @@
 package com.litetodo.app.ui.home.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.litetodo.app.domain.model.Category
 import com.litetodo.app.domain.model.Todo
+import com.litetodo.app.util.parseColor
 
 @Composable
 fun CompletedSection(
@@ -112,7 +114,7 @@ fun CompletedSection(
                                 modifier = Modifier
                                     .size(8.dp)
                                     .clip(CircleShape)
-                                    .then(Modifier.clip(CircleShape))
+                                    .background(parseColor(cat.color))
                             )
                         }
                     }
