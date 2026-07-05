@@ -81,3 +81,15 @@
 - [工作流](./docs/workflow.md)
 - [实施计划](./docs/execution-plan.md)
 - [开发日志](./dev-logs/README.md)
+- [安卓项目](./liteToDo-android/)
+
+## 项目结构
+
+```
+liteToDo/
+├── src/                ← Mac 版前端 (React + TypeScript)
+├── src-tauri/          ← Mac 版后端 (Rust + Tauri)
+├── liteToDo-android/   ← 安卓版 (Kotlin + Jetpack Compose)
+├── docs/               ← 项目文档
+└── dev-logs/           ← 开发日志
+```
