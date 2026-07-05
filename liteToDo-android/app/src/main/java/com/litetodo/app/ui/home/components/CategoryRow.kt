@@ -1,6 +1,7 @@
 package com.litetodo.app.ui.home.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -14,10 +15,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.litetodo.app.domain.model.Category
 import com.litetodo.app.util.parseColor
+import kotlin.math.roundToInt
+import kotlinx.coroutines.delay
 
 @Composable
 fun RowScope.CategoryButton(
@@ -61,9 +65,19 @@ fun CategoryRow(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
+        var shakeOffset by remember { mutableStateOf(0f) }
+        LaunchedEffect(shaking) {
+            if (shaking) {
+                shakeOffset = -6f; delay(50f.toLong()); shakeOffset = 6f
+                delay(50f.toLong()); shakeOffset = -4f; delay(50f.toLong())
+                shakeOffset = 4f; delay(50f.toLong()); shakeOffset = 0f
+            }
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .offset { IntOffset(shakeOffset.roundToInt(), 0) }
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {

@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun triggerShake() {
+    fun triggerShake() {
         _shakeCategories.value = true
         viewModelScope.launch {
             kotlinx.coroutines.delay(500)
@@ -113,6 +113,4 @@ class HomeViewModel @Inject constructor(
     fun setSelectedCategory(categoryId: String?) {
         _selectedCategoryId.value = categoryId
     }
-
-    fun hasInput(input: String): Boolean = input.isNotBlank()
 }

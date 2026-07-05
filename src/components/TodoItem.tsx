@@ -73,15 +73,8 @@ function TodoItem({ todo, category }: TodoItemProps) {
     setEditing(false);
   };
 
-  const toggleExpand = () => {
-    if (!editing) {
-      setShowHistory((prev) => !prev);
-    }
-  };
-
   const longPress = useLongPress({
     onLongPress: () => setShowProgressDialog(true),
-    onClick: toggleExpand,
   });
 
   const formatTime = (ts: number) => {
@@ -172,7 +165,7 @@ function TodoItem({ todo, category }: TodoItemProps) {
                 style={{ backgroundColor: category.color }}
               />
             )}
-            {todo.progressNotes.length > 1 && (
+            {todo.progressNotes.length > 0 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();

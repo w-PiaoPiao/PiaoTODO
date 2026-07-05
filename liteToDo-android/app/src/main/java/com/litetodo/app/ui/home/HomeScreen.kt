@@ -96,11 +96,12 @@ fun HomeScreen(
                     if (inputText.isNotBlank()) {
                         viewModel.addTodo(inputText, categoryId)
                         inputText = ""
+                    } else if (uiState.selectedCategoryId == categoryId) {
+                        // Tap again on the filtered category = remove filter
+                        viewModel.setSelectedCategory(null)
                     } else {
-                        // Click again when filter active removes filter
-                        if (uiState.selectedCategoryId == categoryId) {
-                            viewModel.setSelectedCategory(null)
-                        }
+                        // Empty input with no category or different category = shake
+                        viewModel.triggerShake()
                     }
                 },
                 onLongPressCategory = { categoryId ->

@@ -75,10 +75,10 @@ export const useTodoStore = create<TodoState>((set, get) => ({
       completedAt: null,
       createdAt: now,
       updatedAt: now,
-      order: get().todos.length,
+      order: 0,
       progressNotes: [],
     };
-    set((state) => ({ todos: [...state.todos, todo] }));
+    set((state) => ({ todos: [todo, ...state.todos] }));
   },
 
   completeTodo: (todoId) => {

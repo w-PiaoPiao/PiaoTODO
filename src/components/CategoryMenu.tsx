@@ -16,7 +16,7 @@ const PRESET_COLORS = [
 ];
 
 function CategoryMenu({ categoryId, categoryName, categoryColor, onClose }: CategoryMenuProps) {
-  const [mode, setMode] = useState<"menu" | "rename" | "color">("menu");
+  const [mode, setMode] = useState<"menu" | "rename" | "color" | "confirmDelete">("menu");
   const [renameValue, setRenameValue] = useState(categoryName);
   const { setSelectedCategory, updateCategory, deleteCategory } = useTodoStore();
 
@@ -67,7 +67,7 @@ function CategoryMenu({ categoryId, categoryName, categoryColor, onClose }: Cate
           </button>
           <div className="border-t border-[#F0F0F0] dark:border-[#38383A] mx-2 my-1" />
           <button
-            onClick={handleDelete}
+            onClick={() => setMode("confirmDelete")}
             className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#EF4444] hover:bg-[#FEE2E2] dark:hover:bg-[#3B1C1C] transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -115,6 +115,29 @@ function CategoryMenu({ categoryId, categoryName, categoryColor, onClose }: Cate
                 style={{ backgroundColor: c }}
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {mode === "confirmDelete" && (
+        <div className="p-4 text-center">
+          <p className="text-sm text-[#1C1C1E] dark:text-[#F5F5F5] mb-1">删除分类</p>
+          <p className="text-xs text-[#8E8E93] dark:text-[#98989D] mb-3">
+            该分类下的 todo 将移入「其他」
+          </p>
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={() => setMode("menu")}
+              className="px-4 py-1.5 text-xs text-[#8E8E93] rounded-lg hover:bg-[#F5F5F7] dark:hover:bg-[#3A3A3C] transition-colors"
+            >
+              取消
+            </button>
+            <button
+              onClick={handleDelete}
+              className="px-4 py-1.5 text-xs text-white bg-[#EF4444] rounded-lg hover:bg-[#DC2626] transition-colors"
+            >
+              删除
+            </button>
           </div>
         </div>
       )}

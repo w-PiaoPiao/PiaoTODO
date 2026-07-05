@@ -31,9 +31,9 @@ function CompletedSection({ todos, categories, onClear }: CompletedSectionProps)
           </span>
         </div>
         {expanded ? (
-          <ChevronDown className="w-3.5 h-3.5 text-[#C7C7CC] dark:text-[#636366]" />
-        ) : (
           <ChevronUp className="w-3.5 h-3.5 text-[#C7C7CC] dark:text-[#636366]" />
+        ) : (
+          <ChevronDown className="w-3.5 h-3.5 text-[#C7C7CC] dark:text-[#636366]" />
         )}
       </button>
 

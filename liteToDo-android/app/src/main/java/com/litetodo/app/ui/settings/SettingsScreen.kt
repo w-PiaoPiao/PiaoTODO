@@ -35,6 +35,7 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    var deleteConfirmCategory by remember { mutableStateOf<Category?>(null) }
 
     Scaffold(
         topBar = {
@@ -112,7 +113,7 @@ fun SettingsScreen(
                     category = category,
                     onUpdateName = { name -> viewModel.updateCategoryName(category.id, name) },
                     onUpdateColor = { color -> viewModel.updateCategoryColor(category.id, color) },
-                    onDelete = { viewModel.deleteCategory(category.id) },
+                    onRequestDelete = { deleteConfirmCategory = category },
                     canDelete = uiState.categories.size > 1,
                     categoriesCount = uiState.categories.size
                 )
@@ -133,6 +134,30 @@ fun SettingsScreen(
             }
         )
     }
+
+    if (deleteConfirmCategory != null) {
+        AlertDialog(
+            onDismissRequest = { deleteConfirmCategory = null },
+            title = { Text("删除分类") },
+            text = {
+                Text("该分类下的 todo 将移入「其他」分类。确定删除「${deleteConfirmCategory!!.name}」吗？")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteCategory(deleteConfirmCategory!!.id)
+                        deleteConfirmCategory = null
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) { Text("删除") }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteConfirmCategory = null }) { Text("取消") }
+            }
+        )
+    }
 }
 
 @Composable
@@ -140,7 +165,7 @@ private fun CategoryEditItem(
     category: Category,
     onUpdateName: (String) -> Unit,
     onUpdateColor: (String) -> Unit,
-    onDelete: () -> Unit,
+    onRequestDelete: () -> Unit,
     canDelete: Boolean,
     categoriesCount: Int
 ) {
@@ -213,7 +238,7 @@ private fun CategoryEditItem(
             // Delete
             if (canDelete) {
                 IconButton(
-                    onClick = onDelete,
+                    onClick = { onRequestDelete() },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(

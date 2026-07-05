@@ -123,12 +123,13 @@ describe("todoStore", () => {
     it("should return only incomplete todos", () => {
       useTodoStore.getState().addTodo("任务A", "work");
       useTodoStore.getState().addTodo("任务B", "work");
-      const todoA = useTodoStore.getState().todos[0];
-      useTodoStore.getState().completeTodo(todoA.id);
+      // todos[0] is the last added (任务B) due to prepend
+      const todoB = useTodoStore.getState().todos[0];
+      useTodoStore.getState().completeTodo(todoB.id);
 
       const incomplete = useTodoStore.getState().getIncompleteTodos();
       expect(incomplete).toHaveLength(1);
-      expect(incomplete[0].content).toBe("任务B");
+      expect(incomplete[0].content).toBe("任务A");
     });
   });
 
@@ -136,12 +137,12 @@ describe("todoStore", () => {
     it("should return only completed todos", () => {
       useTodoStore.getState().addTodo("任务A", "work");
       useTodoStore.getState().addTodo("任务B", "work");
-      const todoA = useTodoStore.getState().todos[0];
-      useTodoStore.getState().completeTodo(todoA.id);
+      const todoB = useTodoStore.getState().todos[0];
+      useTodoStore.getState().completeTodo(todoB.id);
 
       const completed = useTodoStore.getState().getCompletedTodos();
       expect(completed).toHaveLength(1);
-      expect(completed[0].content).toBe("任务A");
+      expect(completed[0].content).toBe("任务B");
     });
   });
 
@@ -217,14 +218,15 @@ describe("todoStore", () => {
       useTodoStore.getState().addTodo("任务C", "work");
 
       const todos = useTodoStore.getState().todos;
+      // With prepend: todos = [任务C, 任务B, 任务A]
       const ids = [todos[2].id, todos[1].id, todos[0].id];
 
       useTodoStore.getState().reorderTodos(ids);
 
       const reordered = useTodoStore.getState().todos;
-      expect(reordered[0].content).toBe("任务C");
+      expect(reordered[0].content).toBe("任务A");
       expect(reordered[1].content).toBe("任务B");
-      expect(reordered[2].content).toBe("任务A");
+      expect(reordered[2].content).toBe("任务C");
     });
   });
 });
