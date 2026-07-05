@@ -21,7 +21,11 @@ function DueDatePicker({ dueDate, reminder, onChange, onClose }: DueDatePickerPr
 
   const handleConfirm = () => {
     const ts = new Date(`${dateStr}T${timeStr}:00`).getTime();
-    onChange(ts, hasReminder);
+    if (isNaN(ts)) {
+      onChange(Date.now(), hasReminder);
+    } else {
+      onChange(ts, hasReminder);
+    }
     onClose();
   };
 

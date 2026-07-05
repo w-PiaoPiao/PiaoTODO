@@ -23,7 +23,8 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             DB_NAME
-        ).build()
+        ).addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides

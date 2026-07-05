@@ -39,6 +39,20 @@ describe("todoStore", () => {
       expect(todos[0].completed).toBe(false);
     });
 
+    it("should accept optional dueDate and reminder", () => {
+      useTodoStore.getState().addTodo("任务", "work", 1234567890000, true);
+      const todo = useTodoStore.getState().todos[0];
+      expect(todo.dueDate).toBe(1234567890000);
+      expect(todo.reminder).toBe(true);
+    });
+
+    it("should default dueDate to null and reminder to false", () => {
+      useTodoStore.getState().addTodo("任务", "work");
+      const todo = useTodoStore.getState().todos[0];
+      expect(todo.dueDate).toBeNull();
+      expect(todo.reminder).toBe(false);
+    });
+
     it("should generate unique IDs for each todo", () => {
       useTodoStore.getState().addTodo("任务A", "work");
       useTodoStore.getState().addTodo("任务B", "life");
