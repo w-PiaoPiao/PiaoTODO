@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
+import java.text.SimpleDateFormat
+import java.util.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +40,18 @@ fun TodoItem(
     onLongPress: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    fun formatDueDate(ts: Long): String {
+        val d = Date(ts)
+        val today = Calendar.getInstance()
+        val cal = Calendar.getInstance().apply { time = d }
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(d)
+        return if (today.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR) &&
+            today.get(Calendar.YEAR) == cal.get(Calendar.YEAR))
+            "今天 $time"
+        else
+            SimpleDateFormat("M/d HH:mm", Locale.getDefault()).format(d)
+    }
+
     var editing by remember { mutableStateOf(false) }
     var editText by remember { mutableStateOf(todo.content) }
     var showHistory by remember { mutableStateOf(false) }
@@ -107,6 +123,36 @@ fun TodoItem(
                             editText = todo.content
                         }
                     )
+                }
+
+                // Due date badge
+                if (todo.dueDate != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.AccessTime,
+                            contentDescription = null,
+                            modifier = Modifier.size(11.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(3.dp))
+                        Text(
+                            text = formatDueDate(todo.dueDate),
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        if (todo.reminder) {
+                            Spacer(Modifier.width(2.dp))
+                            Icon(
+                                Icons.Default.Notifications,
+                                contentDescription = null,
+                                modifier = Modifier.size(11.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                 }
 
                 if (todo.progressNotes.isNotEmpty()) {

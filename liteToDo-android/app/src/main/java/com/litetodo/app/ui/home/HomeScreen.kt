@@ -1,19 +1,27 @@
 package com.litetodo.app.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.litetodo.app.ui.common.DueDatePicker
 import com.litetodo.app.ui.common.ProgressDialog
 import com.litetodo.app.ui.home.components.CategoryRow
 import com.litetodo.app.ui.home.components.CompletedSection
@@ -28,6 +36,20 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     var inputText by remember { mutableStateOf("") }
     var progressTodoId by remember { mutableStateOf<String?>(null) }
+    var dueDate by remember { mutableStateOf<Long?>(null) }
+    var reminder by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    fun formatTs(ts: Long): String {
+        val d = java.util.Date(ts)
+        val today = java.util.Calendar.getInstance()
+        val cal = java.util.Calendar.getInstance().apply { time = d }
+        val time = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(d)
+        return if (today.get(java.util.Calendar.DAY_OF_YEAR) == cal.get(java.util.Calendar.DAY_OF_YEAR) &&
+            today.get(java.util.Calendar.YEAR) == cal.get(java.util.Calendar.YEAR))
+            "今天 $time"
+        else
+            java.text.SimpleDateFormat("M/d HH:mm", java.util.Locale.getDefault()).format(d)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.setSelectedCategory(null)
@@ -72,21 +94,73 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Input field
-            OutlinedTextField(
-                value = inputText,
-                onValueChange = { inputText = it },
-                placeholder = { Text("输入待办事项，点击下方分类按钮添加...") },
+            // Input field + clock button
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(8.dp),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = inputText,
+                    onValueChange = { inputText = it },
+                    placeholder = { Text("输入待办事项，点击下方分类按钮添加...") },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
-            )
+                FilledIconButton(
+                    onClick = { showDatePicker = true },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = if (dueDate != null)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(Icons.Default.AccessTime, contentDescription = "设置时间",
+                        modifier = Modifier.size(18.dp))
+                }
+            }
+
+            // Due date badge
+            if (dueDate != null) {
+                Row(
+                    modifier = Modifier.padding(start = 16.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = formatTs(dueDate!!) + if (reminder) " 🔔" else "",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(4.dp))
+                    IconButton(
+                        onClick = { dueDate = null; reminder = false },
+                        modifier = Modifier.size(18.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "清除",
+                            modifier = Modifier.size(12.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
 
             // Category buttons
             CategoryRow(
@@ -94,13 +168,13 @@ fun HomeScreen(
                 selectedCategoryId = uiState.selectedCategoryId,
                 onClickCategory = { categoryId ->
                     if (inputText.isNotBlank()) {
-                        viewModel.addTodo(inputText, categoryId)
+                        viewModel.addTodo(inputText, categoryId, dueDate, reminder)
                         inputText = ""
+                        dueDate = null
+                        reminder = false
                     } else if (uiState.selectedCategoryId == categoryId) {
-                        // Tap again on the filtered category = remove filter
                         viewModel.setSelectedCategory(null)
                     } else {
-                        // Empty input with no category or different category = shake
                         viewModel.triggerShake()
                     }
                 },
@@ -171,6 +245,16 @@ fun HomeScreen(
                 onClear = { viewModel.clearCompleted() }
             )
         }
+    }
+
+    // Date picker dialog
+    if (showDatePicker) {
+        DueDatePicker(
+            dueDate = dueDate,
+            reminder = reminder,
+            onConfirm = { d, r -> dueDate = d; reminder = r; showDatePicker = false },
+            onDismiss = { showDatePicker = false }
+        )
     }
 
     // Progress dialog

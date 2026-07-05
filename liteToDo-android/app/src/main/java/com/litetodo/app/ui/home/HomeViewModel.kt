@@ -65,7 +65,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun addTodo(content: String, categoryId: String) {
+    fun addTodo(content: String, categoryId: String, dueDate: Long? = null, reminder: Boolean = false) {
         val trimmed = content.trim()
         if (trimmed.isEmpty()) {
             triggerShake()
@@ -83,6 +83,8 @@ class HomeViewModel @Inject constructor(
                     createdAt = now,
                     updatedAt = now,
                     order = 0,
+                    dueDate = dueDate,
+                    reminder = reminder,
                     progressNotes = emptyList(),
                     syncId = null
                 )

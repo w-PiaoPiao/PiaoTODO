@@ -21,7 +21,7 @@ interface TodoState {
   getIncompleteTodos: (categoryId?: string | null) => Todo[];
   getCompletedTodos: () => Todo[];
 
-  addTodo: (content: string, categoryId: string) => void;
+  addTodo: (content: string, categoryId: string, dueDate?: number | null, reminder?: boolean) => void;
   completeTodo: (todoId: string) => void;
   toggleTodo: (todoId: string) => void;
   deleteTodo: (todoId: string) => void;
@@ -65,7 +65,7 @@ export const useTodoStore = create<TodoState>((set, get) => ({
     return get().todos.filter((t) => t.completed);
   },
 
-  addTodo: (content, categoryId) => {
+  addTodo: (content, categoryId, dueDate = null, reminder = false) => {
     const now = Date.now();
     const todo: Todo = {
       id: generateId(),
@@ -76,6 +76,8 @@ export const useTodoStore = create<TodoState>((set, get) => ({
       createdAt: now,
       updatedAt: now,
       order: 0,
+      dueDate,
+      reminder,
       progressNotes: [],
     };
     set((state) => ({ todos: [todo, ...state.todos] }));

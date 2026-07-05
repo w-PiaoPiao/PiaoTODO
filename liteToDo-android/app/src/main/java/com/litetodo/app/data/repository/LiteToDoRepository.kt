@@ -24,12 +24,11 @@ class LiteToDoRepository @Inject constructor(
     private val progressNoteListType = object : TypeToken<List<ProgressNote>>() {}.type
 
     // ---- Entity <-> Domain mapping ----
-
     private fun TodoEntity.toDomain(): Todo = Todo(
         id = id, content = content, categoryId = categoryId,
         completed = completed, completedAt = completedAt,
         createdAt = createdAt, updatedAt = updatedAt,
-        order = `order`,
+        order = `order`, dueDate = dueDate, reminder = reminder,
         progressNotes = gson.fromJson(progressNotesJson, progressNoteListType)
             ?: emptyList(),
         syncId = syncId
@@ -39,7 +38,8 @@ class LiteToDoRepository @Inject constructor(
         id = id, content = content, categoryId = categoryId,
         completed = completed, completedAt = completedAt,
         createdAt = createdAt, updatedAt = updatedAt,
-        order = order, progressNotesJson = gson.toJson(progressNotes),
+        order = order, dueDate = dueDate, reminder = reminder,
+        progressNotesJson = gson.toJson(progressNotes),
         syncId = syncId
     )
 

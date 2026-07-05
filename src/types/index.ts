@@ -21,6 +21,8 @@ export interface Todo {
   createdAt: number;
   updatedAt: number;
   order: number;
+  dueDate: number | null;
+  reminder: boolean;
   progressNotes: ProgressNote[];
 }
 

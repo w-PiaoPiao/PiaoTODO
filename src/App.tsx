@@ -12,6 +12,8 @@ function App() {
   const [shakeInput, setShakeInput] = useState(false);
   const [shakeCategory, setShakeCategory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [dueDate, setDueDate] = useState<number | null>(null);
+  const [reminder, setReminder] = useState(false);
 
   const {
     addTodo,
@@ -58,10 +60,12 @@ function App() {
         triggerShake();
         return;
       }
-      addTodo(inputValue.trim(), categoryId);
+      addTodo(inputValue.trim(), categoryId, dueDate, reminder);
       setInputValue("");
+      setDueDate(null);
+      setReminder(false);
     },
-    [inputValue, addTodo, triggerShake]
+    [inputValue, addTodo, triggerShake, dueDate, reminder]
   );
 
   const categories = getCategories();
@@ -87,6 +91,9 @@ function App() {
         value={inputValue}
         onChange={setInputValue}
         shaking={shakeInput}
+        dueDate={dueDate}
+        reminder={reminder}
+        onDueDateChange={(d, r) => { setDueDate(d); setReminder(r); }}
       />
       <CategoryBar
         onSelect={handleCategorySelect}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, ChevronDown, ChevronUp, Clock, GripVertical } from "lucide-react";
+import { X, ChevronDown, ChevronUp, Clock, GripVertical, Bell } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTodoStore } from "../stores/todoStore";
@@ -82,6 +82,15 @@ function TodoItem({ todo, category }: TodoItemProps) {
     return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
   };
 
+  const formatDueDate = (ts: number) => {
+    const d = new Date(ts);
+    const today = new Date();
+    const isToday = d.toDateString() === today.toDateString();
+    const time = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+    if (isToday) return `今天 ${time}`;
+    return `${d.getMonth() + 1}/${d.getDate()} ${time}`;
+  };
+
   return (
     <>
       <div
@@ -148,6 +157,15 @@ function TodoItem({ todo, category }: TodoItemProps) {
               <p className="text-xs text-[#8E8E93] dark:text-[#98989D] mt-0.5 truncate">
                 └ {todo.progressNotes[todo.progressNotes.length - 1].content}
               </p>
+            )}
+            {todo.dueDate && !editing && (
+              <div className="flex items-center gap-1 mt-1">
+                <Clock className="w-3 h-3 text-[#3B82F6]" />
+                <span className="text-[11px] text-[#3B82F6]">
+                  {formatDueDate(todo.dueDate)}
+                </span>
+                {todo.reminder && <Bell className="w-3 h-3 text-[#3B82F6]" />}
+              </div>
             )}
           </div>
 

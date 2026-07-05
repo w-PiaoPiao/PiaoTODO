@@ -13,6 +13,8 @@ data class TodoEntity(
     val createdAt: Long,
     val updatedAt: Long,
     val `order`: Int,
+    val dueDate: Long? = null,
+    val reminder: Boolean = false,
     val progressNotesJson: String = "[]",
     val syncId: String? = null
 )

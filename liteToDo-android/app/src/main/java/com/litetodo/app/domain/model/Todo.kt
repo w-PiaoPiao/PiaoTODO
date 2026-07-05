@@ -9,6 +9,8 @@ data class Todo(
     val createdAt: Long,
     val updatedAt: Long,
     val order: Int,
+    val dueDate: Long? = null,
+    val reminder: Boolean = false,
     val progressNotes: List<ProgressNote> = emptyList(),
     val syncId: String? = null
 )
