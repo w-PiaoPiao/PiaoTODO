@@ -115,7 +115,7 @@ function TodoItem({ todo, category }: TodoItemProps) {
 
         <div className="flex items-start gap-3 relative z-10">
           <button
-            className="mt-1 opacity-0 group-hover:opacity-100 p-0.5 rounded cursor-grab active:cursor-grabbing
+            className="mt-1 p-0.5 rounded cursor-grab active:cursor-grabbing
                        text-[#C7C7CC] dark:text-[#636366] hover:text-[#8E8E93] dark:hover:text-[#98989D] transition-all duration-200 flex-shrink-0"
             {...attributes}
             {...listeners}
