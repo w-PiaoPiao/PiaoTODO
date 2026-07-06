@@ -115,4 +115,8 @@ class HomeViewModel @Inject constructor(
     fun setSelectedCategory(categoryId: String?) {
         _selectedCategoryId.value = categoryId
     }
+
+    fun updateTodo(todoId: String, dueDate: Long) {
+        viewModelScope.launch { repository.updateDueDate(todoId, dueDate) }
+    }
 }

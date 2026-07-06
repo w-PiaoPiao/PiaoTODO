@@ -5,18 +5,18 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTodoStore } from "../stores/todoStore";
 import { useLongPress } from "../hooks/useLongPress";
 import ProgressDialog from "./ProgressDialog";
-import type { Todo, Category } from "../types";
+import type { Todo } from "../types";
 
 interface TodoItemProps {
   todo: Todo;
-  category?: Category;
 }
 
-function TodoItem({ todo, category }: TodoItemProps) {
+function TodoItem({ todo }: TodoItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
   const [showHistory, setShowHistory] = useState(false);
   const [showProgressDialog, setShowProgressDialog] = useState(false);
+  const [showPostponeMenu, setShowPostponeMenu] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toggleTodo, deleteTodo, updateTodoContent, addProgressNote } = useTodoStore();
 
@@ -29,7 +29,6 @@ function TodoItem({ todo, category }: TodoItemProps) {
     isDragging,
   } = useSortable({ id: todo.id });
 
-  const catColor = category?.color ?? "#3B82F6";
   const isOverdue = todo.dueDate && todo.dueDate < Date.now() && !todo.completed;
 
   const style = {
@@ -96,10 +95,14 @@ function TodoItem({ todo, category }: TodoItemProps) {
 
   const postponeOneDay = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const now = Date.now();
-    const current = todo.dueDate ?? now;
-    const newDate = current + 86400000; // +1 day
-    useTodoStore.getState().updateTodo(todo.id, { dueDate: newDate });
+    const current = todo.dueDate ?? Date.now();
+    useTodoStore.getState().updateTodo(todo.id, { dueDate: current + 86400000 });
+  };
+
+  const postponeBy = (ms: number) => {
+    const current = todo.dueDate ?? Date.now();
+    useTodoStore.getState().updateTodo(todo.id, { dueDate: current + ms });
+    setShowPostponeMenu(false);
   };
 
   return (
@@ -110,13 +113,6 @@ function TodoItem({ todo, category }: TodoItemProps) {
         {...longPress}
         className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors cursor-default relative overflow-hidden"
       >
-        {/* Ink-wash brush stroke background */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse 180% 80% at 0% 50%, ${catColor}08 0%, ${catColor}04 40%, transparent 70%)`,
-          }}
-        />
 
         <div className="flex items-start gap-3 relative z-10">
           <button
@@ -185,14 +181,35 @@ function TodoItem({ todo, category }: TodoItemProps) {
                 </span>
                 {todo.reminder && <Bell className={`w-3 h-3 ${isOverdue ? "text-[#EF4444]" : "text-[#3B82F6]"}`} />}
                 {isOverdue && (
-                  <button
-                    onClick={postponeOneDay}
-                    className="ml-1 px-1.5 py-0.5 text-[10px] text-[#EF4444] bg-[#FEE2E2] dark:bg-[#3B1C1C] rounded
-                               hover:bg-[#FECACA] dark:hover:bg-[#5B1C1C] transition-colors"
-                  >
-                    <RotateCcw className="w-3 h-3 inline mr-0.5" />
-                    顺延
-                  </button>
+                  <div className="relative inline-flex">
+                    <PostponeButton
+                      onClick={(e) => { e.stopPropagation(); postponeOneDay(e as any); }}
+                      onLongPress={() => setShowPostponeMenu(true)}
+                    />
+                    {showPostponeMenu && (
+                      <div
+                        className="absolute top-full left-0 mt-1 z-50 bg-white dark:bg-[#2C2C2E] rounded-lg shadow-xl border border-[#F0F0F0] dark:border-[#38383A] overflow-hidden"
+                        onMouseLeave={() => setShowPostponeMenu(false)}
+                      >
+                        {[
+                          { label: "30 分钟", ms: 30 * 60 * 1000 },
+                          { label: "1 小时", ms: 60 * 60 * 1000 },
+                          { label: "3 小时", ms: 3 * 60 * 60 * 1000 },
+                          { label: "1 天", ms: 24 * 60 * 60 * 1000 },
+                          { label: "3 天", ms: 3 * 24 * 60 * 60 * 1000 },
+                        ].map((opt) => (
+                          <button
+                            key={opt.label}
+                            onClick={(e) => { e.stopPropagation(); postponeBy(opt.ms); }}
+                            className="block w-full text-left px-4 py-1.5 text-xs text-[#1C1C1E] dark:text-[#F5F5F5]
+                                       hover:bg-[#F5F5F7] dark:hover:bg-[#3A3A3C] transition-colors whitespace-nowrap"
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
@@ -255,3 +272,20 @@ function TodoItem({ todo, category }: TodoItemProps) {
 }
 
 export default TodoItem;
+
+function PostponeButton({ onClick, onLongPress }: { onClick: (e: React.MouseEvent) => void; onLongPress: () => void }) {
+  const handlers = useLongPress({
+    onLongPress,
+    onClick: () => onClick({} as any),
+  });
+  return (
+    <button
+      {...handlers}
+      className="ml-1 px-1.5 py-0.5 text-[10px] text-[#EF4444] bg-[#FEE2E2] dark:bg-[#3B1C1C] rounded
+                 hover:bg-[#FECACA] dark:hover:bg-[#5B1C1C] transition-colors"
+    >
+      <RotateCcw className="w-3 h-3 inline mr-0.5" />
+      顺延
+    </button>
+  );
+}

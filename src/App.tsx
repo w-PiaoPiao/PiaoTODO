@@ -101,7 +101,6 @@ function App() {
       />
       <TodoList
         todos={displayTodos}
-        categories={categories}
       />
       <CompletedSection
         todos={getCompletedTodos()}

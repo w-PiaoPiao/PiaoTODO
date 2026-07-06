@@ -228,7 +228,11 @@ fun HomeScreen(
                             onUpdateContent = { content ->
                                 viewModel.updateTodoContent(todo.id, content)
                             },
-                            onLongPress = { progressTodoId = todo.id }
+                            onLongPress = { progressTodoId = todo.id },
+                            onPostpone = { ms ->
+                                val currentVal = todo.dueDate ?: System.currentTimeMillis()
+                                viewModel.updateTodo(todo.id, currentVal + ms)
+                            }
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
