@@ -95,8 +95,7 @@ function TodoItem({ todo, category }: TodoItemProps) {
     return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
   };
 
-  const postponeOneDay = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const postponeOneDay = () => {
     const current = todo.dueDate ?? Date.now();
     useTodoStore.getState().updateTodo(todo.id, { dueDate: current + 86400000 });
   };
@@ -185,7 +184,7 @@ function TodoItem({ todo, category }: TodoItemProps) {
                 {isOverdue && (
                   <div className="relative inline-flex">
                     <PostponeButton
-                      onClick={(e) => { e.stopPropagation(); postponeOneDay(e as any); }}
+                      onPostpone1d={postponeOneDay}
                       onLongPress={() => setShowPostponeMenu(true)}
                     />
                     {showPostponeMenu && (
@@ -275,10 +274,10 @@ function TodoItem({ todo, category }: TodoItemProps) {
 
 export default TodoItem;
 
-function PostponeButton({ onClick, onLongPress }: { onClick: (e: React.MouseEvent) => void; onLongPress: () => void }) {
+function PostponeButton({ onPostpone1d, onLongPress }: { onPostpone1d: () => void; onLongPress: () => void }) {
   const handlers = useLongPress({
     onLongPress,
-    onClick: () => onClick({} as any),
+    onClick: onPostpone1d,
   });
   return (
     <button
