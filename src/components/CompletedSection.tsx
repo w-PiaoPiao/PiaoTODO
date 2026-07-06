@@ -49,7 +49,7 @@ function CompletedSection({ todos, categories, onClear }: CompletedSectionProps)
               key={todo.id}
               className="flex items-center gap-3 px-4 py-2 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors group"
               style={{
-                background: `linear-gradient(to right, ${catColor}14 0%, transparent 100%)`,
+                background: `linear-gradient(to right, ${catColor}26 0%, transparent 100%)`,
               }}
             >
               <p className="flex-1 text-sm text-[#C7C7CC] dark:text-[#636366] line-through truncate ml-1">

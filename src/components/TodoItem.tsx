@@ -107,7 +107,7 @@ function TodoItem({ todo, category }: TodoItemProps) {
         ref={setNodeRef}
         style={{
           ...style,
-          background: `linear-gradient(to right, ${catColor}14 0%, transparent 100%)`,
+          background: `linear-gradient(to right, ${catColor}26 0%, transparent 100%)`,
         }}
         {...longPress}
         className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors cursor-default relative overflow-hidden"

@@ -74,7 +74,7 @@ fun CompletedSection(
                             .drawBehind {
                                 drawRect(
                                     brush = Brush.horizontalGradient(
-                                        colors = listOf(catColor.copy(alpha = 0.08f), Color.Transparent)
+                                        colors = listOf(catColor.copy(alpha = 0.15f), Color.Transparent)
                                     ),
                                     size = size
                                 )
