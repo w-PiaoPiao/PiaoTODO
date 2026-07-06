@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Notifications
@@ -23,7 +24,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
@@ -48,6 +52,7 @@ fun TodoItem(
     modifier: Modifier = Modifier
 ) {
     val isOverdue = todo.dueDate != null && todo.dueDate!! < System.currentTimeMillis() && !todo.completed
+    val catColor = category?.color?.let { parseColor(it) } ?: Color(0xFF3B82F6)
     val overdueColor = Color(0xFFEF4444)
 
     fun formatDueDate(ts: Long): String {
@@ -68,6 +73,13 @@ fun TodoItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .drawBehind {
+                drawRect(
+                    color = catColor.copy(alpha = 0.3f),
+                    topLeft = Offset(0f, 0f),
+                    size = androidx.compose.ui.geometry.Size(3.dp.toPx(), size.height)
+                )
+            }
             .clickable { showHistory = !showHistory }
             .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {

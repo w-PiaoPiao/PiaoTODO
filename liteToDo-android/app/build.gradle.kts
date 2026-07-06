@@ -82,6 +82,9 @@ dependencies {
     // DataStore (settings persistence)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
+    // Reorderable list (drag & drop)
+    implementation("sh.calvin.reorderable:reorderable:2.4.0")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

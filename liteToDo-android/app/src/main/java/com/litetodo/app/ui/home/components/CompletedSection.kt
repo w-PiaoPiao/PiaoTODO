@@ -15,6 +15,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -63,9 +65,18 @@ fun CompletedSection(
         AnimatedVisibility(visible = expanded) {
             Column {
                 completedTodos.forEach { todo ->
+                    val cat = categoryMap[todo.categoryId]
+                    val catColor = cat?.color?.let { parseColor(it) } ?: Color(0xFF3B82F6)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .drawBehind {
+                                drawRect(
+                                    color = catColor.copy(alpha = 0.3f),
+                                    topLeft = Offset(0f, 0f),
+                                    size = androidx.compose.ui.geometry.Size(3.dp.toPx(), size.height)
+                                )
+                            }
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -87,7 +98,6 @@ fun CompletedSection(
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
                         }
-                        val cat = categoryMap[todo.categoryId]
                         if (cat != null) {
                             Box(modifier = Modifier.size(8.dp).clip(CircleShape)
                                 .background(parseColor(cat.color)))

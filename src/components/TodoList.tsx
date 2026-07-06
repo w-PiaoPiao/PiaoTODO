@@ -12,10 +12,11 @@ import {
 } from "@dnd-kit/sortable";
 import { useTodoStore } from "../stores/todoStore";
 import TodoItem from "./TodoItem";
-import type { Todo } from "../types";
+import type { Category, Todo } from "../types";
 
 interface TodoListProps {
   todos: Todo[];
+  categories: Category[];
 }
 
 function EmptyState() {
@@ -31,8 +32,9 @@ function EmptyState() {
   );
 }
 
-function TodoList({ todos }: TodoListProps) {
+function TodoList({ todos, categories }: TodoListProps) {
   const reorderTodos = useTodoStore((s) => s.reorderTodos);
+  const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -62,6 +64,7 @@ function TodoList({ todos }: TodoListProps) {
             <TodoItem
               key={todo.id}
               todo={todo}
+              category={categoryMap.get(todo.categoryId)}
             />
           ))}
         </div>

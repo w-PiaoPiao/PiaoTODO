@@ -41,10 +41,14 @@ function CompletedSection({ todos, categories, onClear }: CompletedSectionProps)
 
       {expanded && (
         <div className="pb-2">
-          {sorted.map((todo) => (
+          {sorted.map((todo) => {
+            const cat = categoryMap.get(todo.categoryId);
+            const catColor = cat?.color ?? "#3B82F6";
+            return (
             <div
               key={todo.id}
               className="flex items-center gap-3 px-4 py-2 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors group"
+              style={{ borderLeft: `3px solid ${catColor}4D` }}
             >
               <div className="w-5 h-5 rounded-full bg-[#3B82F6] flex items-center justify-center flex-shrink-0">
                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,14 +66,12 @@ function CompletedSection({ todos, categories, onClear }: CompletedSectionProps)
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
-              {(() => {
-                const cat = categoryMap.get(todo.categoryId);
-                return cat ? (
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
-                ) : null;
-              })()}
+              {cat && (
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
+              )}
             </div>
-          ))}
+            );
+          })}
           <button
             onClick={onClear}
             className="flex items-center gap-1.5 mx-4 mt-1 px-2 py-1 rounded-md

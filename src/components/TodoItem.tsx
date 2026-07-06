@@ -5,13 +5,14 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTodoStore } from "../stores/todoStore";
 import { useLongPress } from "../hooks/useLongPress";
 import ProgressDialog from "./ProgressDialog";
-import type { Todo } from "../types";
+import type { Todo, Category } from "../types";
 
 interface TodoItemProps {
   todo: Todo;
+  category?: Category;
 }
 
-function TodoItem({ todo }: TodoItemProps) {
+function TodoItem({ todo, category }: TodoItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
   const [showHistory, setShowHistory] = useState(false);
@@ -29,6 +30,7 @@ function TodoItem({ todo }: TodoItemProps) {
     isDragging,
   } = useSortable({ id: todo.id });
 
+  const catColor = category?.color ?? "#3B82F6";
   const isOverdue = todo.dueDate && todo.dueDate < Date.now() && !todo.completed;
 
   const style = {
@@ -109,7 +111,7 @@ function TodoItem({ todo }: TodoItemProps) {
     <>
       <div
         ref={setNodeRef}
-        style={style}
+        style={{ ...style, borderLeft: `3px solid ${catColor}4D` }}
         {...longPress}
         className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors cursor-default relative overflow-hidden"
       >

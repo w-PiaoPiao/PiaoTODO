@@ -119,4 +119,16 @@ class HomeViewModel @Inject constructor(
     fun updateTodo(todoId: String, dueDate: Long) {
         viewModelScope.launch { repository.updateDueDate(todoId, dueDate) }
     }
+
+    fun reorderTodos(from: Int, to: Int) {
+        val list = incomplete.value.toMutableList()
+        if (from < 0 || from >= list.size || to < 0 || to >= list.size) return
+        val item = list.removeAt(from)
+        list.add(to, item)
+        viewModelScope.launch {
+            list.forEachIndexed { index, todo ->
+                repository.updateOrder(todo.id, index)
+            }
+        }
+    }
 }

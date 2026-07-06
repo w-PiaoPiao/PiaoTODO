@@ -116,6 +116,11 @@ class LiteToDoRepository @Inject constructor(
         todoDao.upsert(entity.copy(dueDate = dueDate, updatedAt = System.currentTimeMillis()))
     }
 
+    suspend fun updateOrder(id: String, order: Int) {
+        val entity = todoDao.getById(id) ?: return
+        todoDao.upsert(entity.copy(order = order, updatedAt = System.currentTimeMillis()))
+    }
+
     suspend fun addProgressNote(todoId: String, noteContent: String) {
         val entity = todoDao.getById(todoId) ?: return
         val notes: MutableList<ProgressNote> = gson.fromJson(
