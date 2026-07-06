@@ -5,12 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,6 +26,8 @@ import com.litetodo.app.ui.common.ProgressDialog
 import com.litetodo.app.ui.home.components.CategoryRow
 import com.litetodo.app.ui.home.components.CompletedSection
 import com.litetodo.app.ui.home.components.TodoItem
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -210,32 +214,61 @@ fun HomeScreen(
                     }
                 }
             } else {
+                val listState = rememberLazyListState()
+                val reorderState = rememberReorderableLazyListState(
+                    lazyListState = listState,
+                    onMove = { from, to ->
+                        viewModel.reorderTodos(from.index, to.index)
+                    }
+                )
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier.weight(1f)
                 ) {
                     items(
                         items = uiState.incompleteTodos,
                         key = { it.id }
                     ) { todo ->
-                        val category = uiState.categories.find { it.id == todo.categoryId }
-                        TodoItem(
-                            todo = todo,
-                            category = category,
-                            onToggle = { viewModel.toggleTodo(todo.id) },
-                            onDelete = { viewModel.deleteTodo(todo.id) },
-                            onUpdateContent = { content ->
-                                viewModel.updateTodoContent(todo.id, content)
-                            },
-                            onLongPress = { progressTodoId = todo.id },
-                            onPostpone = { ms ->
-                                val currentVal = todo.dueDate ?: System.currentTimeMillis()
-                                viewModel.updateTodo(todo.id, currentVal + ms)
+                        ReorderableItem(
+                            state = reorderState,
+                            key = todo.id
+                        ) { isDragging ->
+                            val category = uiState.categories.find { it.id == todo.categoryId }
+                            val dragHandleModifier = Modifier
+                                .size(20.dp)
+                                .padding(start = 4.dp)
+                                .longPressDraggableHandle()
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "拖拽排序",
+                                    modifier = dragHandleModifier,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                )
+                                Box(modifier = Modifier.weight(1f)) {
+                                    TodoItem(
+                                        todo = todo,
+                                        category = category,
+                                        onToggle = { viewModel.toggleTodo(todo.id) },
+                                        onDelete = { viewModel.deleteTodo(todo.id) },
+                                        onUpdateContent = { content ->
+                                            viewModel.updateTodoContent(todo.id, content)
+                                        },
+                                        onLongPress = { progressTodoId = todo.id },
+                                        onPostpone = { ms ->
+                                            val currentVal = todo.dueDate ?: System.currentTimeMillis()
+                                            viewModel.updateTodo(todo.id, currentVal + ms)
+                                        }
+                                    )
+                                }
                             }
-                        )
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                        )
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                            )
+                        }
                     }
                 }
             }
