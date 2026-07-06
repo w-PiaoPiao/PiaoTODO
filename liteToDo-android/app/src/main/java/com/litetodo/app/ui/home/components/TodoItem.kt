@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -167,17 +168,20 @@ fun TodoItem(
 
             Spacer(Modifier.width(8.dp))
 
-            // Category dot + delete
+            // Quick complete button (replaces category dot)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (category != null) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(parseColor(category.color))
+                IconButton(
+                    onClick = { onToggle() },
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = "快速办结",
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                     )
                 }
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(4.dp))
                 IconButton(
                     onClick = onDelete,
                     modifier = Modifier.size(28.dp)

@@ -1,18 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { X, ChevronDown, ChevronUp, Clock, GripVertical, Bell } from "lucide-react";
+import { X, ChevronDown, ChevronUp, Clock, GripVertical, Bell, CheckCircle } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTodoStore } from "../stores/todoStore";
 import { useLongPress } from "../hooks/useLongPress";
 import ProgressDialog from "./ProgressDialog";
-import type { Todo, Category } from "../types";
+import type { Todo } from "../types";
 
 interface TodoItemProps {
   todo: Todo;
-  category?: Category;
 }
 
-function TodoItem({ todo, category }: TodoItemProps) {
+function TodoItem({ todo }: TodoItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
   const [showHistory, setShowHistory] = useState(false);
@@ -177,12 +176,14 @@ function TodoItem({ todo, category }: TodoItemProps) {
             >
               <X className="w-3.5 h-3.5" />
             </button>
-            {category && (
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: category.color }}
-              />
-            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); toggleTodo(todo.id); }}
+              className="p-1 rounded-md text-[#C7C7CC] dark:text-[#636366]
+                         hover:text-[#10B981] hover:bg-[#ECFDF5] dark:hover:bg-[#1A3A2A] transition-all duration-200"
+              title="快速办结"
+            >
+              <CheckCircle className="w-4 h-4" />
+            </button>
             {todo.progressNotes.length > 0 && (
               <button
                 onClick={(e) => {
