@@ -48,11 +48,6 @@ function TodoItem({ todo, category }: TodoItemProps) {
     }
   }, [editing]);
 
-  const handleComplete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleTodo(todo.id);
-  };
-
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     deleteTodo(todo.id);
@@ -110,7 +105,10 @@ function TodoItem({ todo, category }: TodoItemProps) {
     <>
       <div
         ref={setNodeRef}
-        style={{ ...style, borderLeft: `3px solid ${catColor}4D` }}
+        style={{
+          ...style,
+          background: `linear-gradient(to right, ${catColor}14 0%, transparent 100%)`,
+        }}
         {...longPress}
         className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors cursor-default relative overflow-hidden"
       >
@@ -124,23 +122,6 @@ function TodoItem({ todo, category }: TodoItemProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <GripVertical className="w-3.5 h-3.5" />
-          </button>
-
-          <button
-            onClick={handleComplete}
-            className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center
-                        transition-all duration-200
-                        ${
-                          todo.completed
-                            ? "bg-[#3B82F6] border-[#3B82F6]"
-                            : "border-[#C7C7CC] dark:border-[#636366] hover:border-[#3B82F6]"
-                        }`}
-          >
-            {todo.completed && (
-              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            )}
           </button>
 
           <div className="flex-1 min-w-0">

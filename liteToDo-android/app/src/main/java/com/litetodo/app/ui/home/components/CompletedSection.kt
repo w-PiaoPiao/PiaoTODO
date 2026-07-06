@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -72,21 +73,15 @@ fun CompletedSection(
                             .fillMaxWidth()
                             .drawBehind {
                                 drawRect(
-                                    color = catColor.copy(alpha = 0.3f),
-                                    topLeft = Offset(0f, 0f),
-                                    size = androidx.compose.ui.geometry.Size(3.dp.toPx(), size.height)
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(catColor.copy(alpha = 0.08f), Color.Transparent)
+                                    ),
+                                    size = size
                                 )
                             }
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text("✓", color = Color.White, fontSize = 12.sp)
-                            }
-                        }
-                        Spacer(Modifier.width(12.dp))
                         Text(
                             text = todo.content, fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),

@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -73,9 +73,10 @@ fun TodoItem(
             .fillMaxWidth()
             .drawBehind {
                 drawRect(
-                    color = catColor.copy(alpha = 0.3f),
-                    topLeft = Offset(0f, 0f),
-                    size = androidx.compose.ui.geometry.Size(3.dp.toPx(), size.height)
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(catColor.copy(alpha = 0.08f), Color.Transparent)
+                    ),
+                    size = size
                 )
             }
             .clickable { showHistory = !showHistory }
@@ -85,20 +86,6 @@ fun TodoItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Complete circle
-            Box(
-                modifier = Modifier.size(22.dp).clip(CircleShape)
-                    .background(
-                        if (todo.completed) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                    ).clickable { onToggle() },
-                contentAlignment = Alignment.Center
-            ) {
-                if (todo.completed) Text("✓", color = Color.White, fontSize = 12.sp)
-            }
-
-            Spacer(Modifier.width(12.dp))
-
             // Content
             Column(modifier = Modifier.weight(1f)) {
                 if (editing) {
