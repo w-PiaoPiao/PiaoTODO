@@ -237,7 +237,7 @@ fun HomeScreen(
                             val dragHandleModifier = Modifier
                                 .size(20.dp)
                                 .padding(start = 4.dp)
-                                .longPressDraggableHandle()
+                                .draggableHandle()
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.fillMaxWidth()
