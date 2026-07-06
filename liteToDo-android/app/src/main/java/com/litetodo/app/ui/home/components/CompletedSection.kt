@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ fun CompletedSection(
     completedTodos: List<Todo>,
     categories: List<Category>,
     onClear: () -> Unit,
+    onToggle: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (completedTodos.isEmpty()) return
@@ -44,30 +46,18 @@ fun CompletedSection(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                "已完成",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Text("已完成", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.width(6.dp))
-            Surface(
-                shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colorScheme.surfaceVariant
-            ) {
-                Text(
-                    "${completedTodos.size}",
-                    fontSize = 10.sp,
+            Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant) {
+                Text("${completedTodos.size}", fontSize = 10.sp,
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Spacer(Modifier.weight(1f))
             Icon(
                 if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                contentDescription = null, modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
         AnimatedVisibility(visible = expanded) {
@@ -79,56 +69,33 @@ fun CompletedSection(
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(22.dp)
-                                .clip(CircleShape)
-                                .then(
-                                    Modifier
-                                        .clip(CircleShape)
-                                        .clickable {}
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Surface(
-                                shape = CircleShape,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(22.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text("✓", color = Color.White, fontSize = 12.sp)
-                                }
+                        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text("✓", color = Color.White, fontSize = 12.sp)
                             }
                         }
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            text = todo.content,
-                            fontSize = 14.sp,
+                            text = todo.content, fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                             textDecoration = TextDecoration.LineThrough,
                             modifier = Modifier.weight(1f)
                         )
+                        IconButton(onClick = { onToggle(todo.id) }, modifier = Modifier.size(28.dp)) {
+                            Icon(Icons.Default.Refresh, contentDescription = "恢复",
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                        }
                         val cat = categoryMap[todo.categoryId]
                         if (cat != null) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(parseColor(cat.color))
-                            )
+                            Box(modifier = Modifier.size(8.dp).clip(CircleShape)
+                                .background(parseColor(cat.color)))
                         }
                     }
                 }
-
-                TextButton(
-                    onClick = onClear,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                ) {
-                    Icon(
-                        Icons.Default.DeleteSweep,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp)
-                    )
+                TextButton(onClick = onClear, modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
+                    Icon(Icons.Default.DeleteSweep, contentDescription = null, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(4.dp))
                     Text("清空已完成", fontSize = 12.sp)
                 }

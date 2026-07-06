@@ -27,6 +27,7 @@ interface TodoState {
   deleteTodo: (todoId: string) => void;
   updateTodoContent: (todoId: string, content: string) => void;
   addProgressNote: (todoId: string, content: string) => void;
+  updateTodo: (todoId: string, updates: Partial<Pick<Todo, "dueDate" | "reminder" | "content">>) => void;
   clearCompleted: () => void;
   reorderTodos: (todoIds: string[]) => void;
   setSelectedCategory: (categoryId: string | null) => void;
@@ -135,6 +136,14 @@ export const useTodoStore = create<TodoState>((set, get) => ({
               ],
             }
           : t
+      ),
+    }));
+  },
+
+  updateTodo: (todoId, updates) => {
+    set((state) => ({
+      todos: state.todos.map((t) =>
+        t.id === todoId ? { ...t, ...updates, updatedAt: Date.now() } : t
       ),
     }));
   },

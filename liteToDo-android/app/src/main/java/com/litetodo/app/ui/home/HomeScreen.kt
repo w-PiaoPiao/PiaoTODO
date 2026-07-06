@@ -105,7 +105,7 @@ fun HomeScreen(
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    placeholder = { Text("输入待办事项，点击下方分类按钮添加...") },
+                    placeholder = { Text("输入待办事项...") },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp),
                     singleLine = true,
@@ -242,7 +242,8 @@ fun HomeScreen(
             CompletedSection(
                 completedTodos = uiState.completedTodos,
                 categories = uiState.categories,
-                onClear = { viewModel.clearCompleted() }
+                onClear = { viewModel.clearCompleted() },
+                onToggle = { todoId -> viewModel.toggleTodo(todoId) }
             )
         }
     }

@@ -1,17 +1,18 @@
 import { useState, useRef, useEffect } from "react";
-import { X, ChevronDown, ChevronUp, Clock, GripVertical, Bell, CheckCircle } from "lucide-react";
+import { X, ChevronDown, ChevronUp, Clock, GripVertical, Bell, CheckCircle, RotateCcw } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTodoStore } from "../stores/todoStore";
 import { useLongPress } from "../hooks/useLongPress";
 import ProgressDialog from "./ProgressDialog";
-import type { Todo } from "../types";
+import type { Todo, Category } from "../types";
 
 interface TodoItemProps {
   todo: Todo;
+  category?: Category;
 }
 
-function TodoItem({ todo }: TodoItemProps) {
+function TodoItem({ todo, category }: TodoItemProps) {
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
   const [showHistory, setShowHistory] = useState(false);
@@ -27,6 +28,9 @@ function TodoItem({ todo }: TodoItemProps) {
     transition,
     isDragging,
   } = useSortable({ id: todo.id });
+
+  const catColor = category?.color ?? "#3B82F6";
+  const isOverdue = todo.dueDate && todo.dueDate < Date.now() && !todo.completed;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -76,11 +80,6 @@ function TodoItem({ todo }: TodoItemProps) {
     onLongPress: () => setShowProgressDialog(true),
   });
 
-  const formatTime = (ts: number) => {
-    const d = new Date(ts);
-    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
-  };
-
   const formatDueDate = (ts: number) => {
     const d = new Date(ts);
     const today = new Date();
@@ -90,15 +89,36 @@ function TodoItem({ todo }: TodoItemProps) {
     return `${d.getMonth() + 1}/${d.getDate()} ${time}`;
   };
 
+  const formatTime = (ts: number) => {
+    const d = new Date(ts);
+    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+  };
+
+  const postponeOneDay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    const current = todo.dueDate ?? now;
+    const newDate = current + 86400000; // +1 day
+    useTodoStore.getState().updateTodo(todo.id, { dueDate: newDate });
+  };
+
   return (
     <>
       <div
         ref={setNodeRef}
         style={style}
         {...longPress}
-        className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors cursor-default"
+        className="group flex flex-col px-4 py-2.5 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors cursor-default relative overflow-hidden"
       >
-        <div className="flex items-start gap-3">
+        {/* Ink-wash brush stroke background */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse 180% 80% at 0% 50%, ${catColor}08 0%, ${catColor}04 40%, transparent 70%)`,
+          }}
+        />
+
+        <div className="flex items-start gap-3 relative z-10">
           <button
             className="mt-1 opacity-0 group-hover:opacity-100 p-0.5 rounded cursor-grab active:cursor-grabbing
                        text-[#C7C7CC] dark:text-[#636366] hover:text-[#8E8E93] dark:hover:text-[#98989D] transition-all duration-200 flex-shrink-0"
@@ -159,16 +179,26 @@ function TodoItem({ todo }: TodoItemProps) {
             )}
             {todo.dueDate && !editing && (
               <div className="flex items-center gap-1 mt-1">
-                <Clock className="w-3 h-3 text-[#3B82F6]" />
-                <span className="text-[11px] text-[#3B82F6]">
+                <Clock className={`w-3 h-3 ${isOverdue ? "text-[#EF4444]" : "text-[#3B82F6]"}`} />
+                <span className={`text-[11px] ${isOverdue ? "text-[#EF4444] font-medium" : "text-[#3B82F6]"}`}>
                   {formatDueDate(todo.dueDate)}
                 </span>
-                {todo.reminder && <Bell className="w-3 h-3 text-[#3B82F6]" />}
+                {todo.reminder && <Bell className={`w-3 h-3 ${isOverdue ? "text-[#EF4444]" : "text-[#3B82F6]"}`} />}
+                {isOverdue && (
+                  <button
+                    onClick={postponeOneDay}
+                    className="ml-1 px-1.5 py-0.5 text-[10px] text-[#EF4444] bg-[#FEE2E2] dark:bg-[#3B1C1C] rounded
+                               hover:bg-[#FECACA] dark:hover:bg-[#5B1C1C] transition-colors"
+                  >
+                    <RotateCcw className="w-3 h-3 inline mr-0.5" />
+                    顺延
+                  </button>
+                )}
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0 relative z-10">
             <button
               onClick={handleDelete}
               className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-[#C7C7CC] dark:text-[#636366]
@@ -199,7 +229,7 @@ function TodoItem({ todo }: TodoItemProps) {
         </div>
 
         {showHistory && todo.progressNotes.length > 0 && (
-          <div className="ml-8 mt-2 space-y-1.5 border-l-2 border-[#E5E7EB] dark:border-[#38383A] pl-3">
+          <div className="ml-8 mt-2 space-y-1.5 border-l-2 border-[#E5E7EB] dark:border-[#38383A] pl-3 relative z-10">
             {[...todo.progressNotes].reverse().map((note) => (
               <div key={note.id} className="flex items-start gap-2">
                 <Clock className="w-3 h-3 text-[#C7C7CC] dark:text-[#636366] mt-0.5 flex-shrink-0" />

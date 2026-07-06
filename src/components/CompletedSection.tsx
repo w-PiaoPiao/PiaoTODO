@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, RotateCcw } from "lucide-react";
+import { useTodoStore } from "../stores/todoStore";
 import type { Todo, Category } from "../types";
 
 interface CompletedSectionProps {
@@ -10,6 +11,7 @@ interface CompletedSectionProps {
 
 function CompletedSection({ todos, categories, onClear }: CompletedSectionProps) {
   const [expanded, setExpanded] = useState(false);
+  const toggleTodo = useTodoStore((s) => s.toggleTodo);
 
   if (todos.length === 0) return null;
 
@@ -42,7 +44,7 @@ function CompletedSection({ todos, categories, onClear }: CompletedSectionProps)
           {sorted.map((todo) => (
             <div
               key={todo.id}
-              className="flex items-center gap-3 px-4 py-2 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors"
+              className="flex items-center gap-3 px-4 py-2 hover:bg-[#F5F5F7] dark:hover:bg-[#2C2C2E] transition-colors group"
             >
               <div className="w-5 h-5 rounded-full bg-[#3B82F6] flex items-center justify-center flex-shrink-0">
                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,13 +54,18 @@ function CompletedSection({ todos, categories, onClear }: CompletedSectionProps)
               <p className="flex-1 text-sm text-[#C7C7CC] dark:text-[#636366] line-through truncate">
                 {todo.content}
               </p>
+              <button
+                onClick={() => toggleTodo(todo.id)}
+                className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-[#C7C7CC] dark:text-[#636366]
+                           hover:text-[#F59E0B] hover:bg-[#FEF3C7] dark:hover:bg-[#3A2A0A] transition-all duration-200"
+                title="恢复为未办结"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
               {(() => {
                 const cat = categoryMap.get(todo.categoryId);
                 return cat ? (
-                  <span
-                    className="w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: cat.color }}
-                  />
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
                 ) : null;
               })()}
             </div>
