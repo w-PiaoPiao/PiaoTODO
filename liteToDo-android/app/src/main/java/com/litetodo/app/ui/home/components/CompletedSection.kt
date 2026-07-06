@@ -93,10 +93,6 @@ fun CompletedSection(
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
                         }
-                        if (cat != null) {
-                            Box(modifier = Modifier.size(8.dp).clip(CircleShape)
-                                .background(parseColor(cat.color)))
-                        }
                     }
                 }
                 TextButton(onClick = onClear, modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
