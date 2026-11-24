@@ -4,3 +4,7 @@ target/
 .superpowers/
 *.local
 .DS_Store
+
+# 安装包/构建缓存不入库
+*.apk
+.kotlin/
